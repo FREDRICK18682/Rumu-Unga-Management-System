@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'expenses',
+    'finances',
+    'inventory',
+    'maintenances',
+    'milling',
+    'procurement',
+    'reports',
+    'sales',
 ]
 
 MIDDLEWARE = [
@@ -72,10 +80,34 @@ WSGI_APPLICATION = 'ungamillsystem.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+#DATABASES = {
+    #'default': {
+     #   'ENGINE': 'django.db.backends.sqlite3',
+      #  'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+#}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':'mssql',
+        'NAME': 'unga_mill',
+        'HOST': 'Localhost',
+        'PORT':'',
+        'OPTIONS':{
+            'driver':'ODBC Driver 17 for SQL Server',
+            'extra-params': 'Trusted_Connection=yes;TrustServerCertificate=yes',
+                    }
+    }
+}
+DATABASES = {
+    'default': {
+        'ENGINE': 'mssql',
+        'NAME': 'unga_mill',
+        'HOST': 'localhost',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'extra_params': 'Trusted_Connection=yes;TrustServerCertificate=yes',
+        }
     }
 }
 
