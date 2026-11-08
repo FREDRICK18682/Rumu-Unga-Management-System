@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'procurement',
     'reports',
     'sales',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
