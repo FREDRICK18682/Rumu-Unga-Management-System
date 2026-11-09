@@ -145,16 +145,31 @@
                     <tr class="border-b">
                         <td class="p-4 font-medium">Maize Bags</td>
                         <td class="p-4" id="stockMaize">0</td>
+                        <td class="p-4 text-right">
+                            <button onclick="editStock('papers')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                                Edit
+                            </button>
+                        </td>
                     </tr>
 
                     <tr class="border-b">
                         <td class="p-4 font-medium">Packaging Papers</td>
                         <td class="p-4" id="stockPapers">0</td>
+                        <td class="p-4 text-right">
+                            <button onclick="editStock('papers')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                                Edit
+                            </button>
+                        </td>
                     </tr>
 
                     <tr class="border-b">
                         <td class="p-4 font-medium">Packaging Bags</td>
                         <td class="p-4" id="stockBags">0</td>
+                        <td class="p-4 text-right">
+                            <button onclick="editStock('papers')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                                Edit
+                            </button>
+                        </td>
                     </tr>
 
                 </tbody>
@@ -189,6 +204,81 @@ function updateStock() {
     document.getElementById('stockMaize').textContent = maizeStock;
     document.getElementById('stockPapers').textContent = papersStock;
     document.getElementById('stockBags').textContent = bagsStock;
+}
+// Placeholder function for editing stock rows
+function editStock(itemType) {
+    let currentVal = 0;
+    let itemName = "";
+
+    if (itemType === 'maize') {
+        currentVal = maizeStock;
+        itemName = "Maize Bags";
+    } else if (itemType === 'papers') {
+        currentVal = papersStock;
+        itemName = "Packaging Papers";
+    } else if (itemType === 'bags') {
+        currentVal = bagsStock;
+        itemName = "Packaging Bags";
+    }
+
+    const newVal = prompt(`Edit quantity for ${itemName}:`, currentVal);
+    if (newVal !== null && newVal.trim() !== "") {
+        const parsed = parseInt(newVal, 10);
+        if (!isNaN(parsed) && parsed >= 0) {
+            if (itemType === 'maize') maizeStock = parsed;
+            if (itemType === 'papers') papersStock = parsed;
+            if (itemType === 'bags') bagsStock = parsed;
+            updateStock();
+            // TODO: Add backend API call here if you want to persist the manual correction to your Django database
+        } else {
+            alert("Please enter a valid positive number.");
+        }
+    }
+}
+// Active Edit stock function communicating with Django API
+async function editStock(itemType) {
+    let itemName = itemType === 'maize' ? "Maize Bags" : (itemType === 'papers' ? "Packaging Papers" : "Packaging Bags");
+    let currentQty = itemType === 'maize' ? maizeStock : (itemType === 'papers' ? papersStock : bagsStock);
+
+    const qtyPrompt = prompt(`Enter new total quantity for ${itemName}:`, currentQty);
+    if (qtyPrompt === null) return;
+
+    const costPrompt = prompt(`Enter total cost for this update:`, "0.00");
+    if (costPrompt === null) return;
+
+    const newQty = parseInt(qtyPrompt, 10);
+    const newCost = parseFloat(costPrompt);
+
+    if (isNaN(newQty) || newQty < 0 || isNaN(newCost) || newCost < 0) {
+        alert("Please enter valid positive numbers.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/update-stock/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                item_type: itemType,
+                quantity: newQty,
+                cost: newCost
+            })
+        });
+
+        if (response.ok) {
+            alert('Updated successfully in database!');
+            loadStock(); // Reload stock from the backend to refresh numbers
+        } else {
+            const err = await response.json();
+            alert('Failed to update: ' + err.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error while updating stock.');
+    }
 }
 
 // CSRF token helper for Django
