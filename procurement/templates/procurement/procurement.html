@@ -166,15 +166,54 @@
 
 </div>
 <script>
+// Global stock variables
+let maizeStock = 0;
+let papersStock = 0;
+let bagsStock = 0;
+
+// Function to toggle between forms
+function showForm(formId) {
+    document.getElementById('maizeForm').classList.add('hidden');
+    document.getElementById('packagingForm').classList.add('hidden');
+    document.getElementById(formId).classList.remove('hidden');
+}
+
+// Function to hide all forms
+function hideForms() {
+    document.getElementById('maizeForm').classList.add('hidden');
+    document.getElementById('packagingForm').classList.add('hidden');
+}
+
+// Update the inventory table view
+function updateStock() {
+    document.getElementById('stockMaize').textContent = maizeStock;
+    document.getElementById('stockPapers').textContent = papersStock;
+    document.getElementById('stockBags').textContent = bagsStock;
+}
+
+// CSRF token helper for Django
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Maize Form Submission
 document.getElementById("maizePurchaseForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    // Capture values explicitly using querySelector to avoid hidden state bugs
     const bagsVal = document.querySelector("#maize_bags").value;
     const costVal = document.querySelector("#maize_cost").value;
     const dateVal = document.querySelector("#maize_date").value;
-
-    console.log("Sending data:", { bagsVal, costVal, dateVal });
 
     if (!bagsVal || !costVal || !dateVal) {
         alert("Please fill in all fields.");
@@ -213,6 +252,82 @@ document.getElementById("maizePurchaseForm").addEventListener("submit", async fu
         alert('Failed to connect to the server.');
     }
 });
+
+// Packaging Form Submission (Added)
+document.getElementById("packagingPurchaseForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const papersVal = document.querySelector("#pkg_papers").value;
+    const costPapersVal = document.querySelector("#pkg_cost_papers").value;
+    const bagsVal = document.querySelector("#pkg_bags").value;
+    const costBagsVal = document.querySelector("#pkg_cost_bags").value;
+    const dateVal = document.querySelector("#pkg_date").value;
+
+    if (papersVal === "" || costPapersVal === "" || bagsVal === "" || costBagsVal === "" || !dateVal) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    const formData = {
+        number_of_papers: parseInt(papersVal, 10),
+        cost_of_papers: parseFloat(costPapersVal),
+        number_of_bags: parseInt(bagsVal, 10),
+        cost_of_bags: parseFloat(costBagsVal),
+        date_bought: dateVal
+    };
+
+    try {
+        const response = await fetch('/api/packaging/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            papersStock += parseInt(papersVal, 10);
+            bagsStock += parseInt(bagsVal, 10);
+            updateStock();
+            alert('Packaging purchase saved successfully to database!');
+            this.reset();
+            hideForms();
+        } else {
+            const errorData = await response.json();
+            console.error('Validation errors:', errorData);
+            alert('Error saving data: ' + JSON.stringify(errorData));
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('Failed to connect to the server.');
+    }
+});
+
+// Function to fetch current stock from the database on page load
+async function loadStock() {
+    try {
+        const response = await fetch('/api/stock/');
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Update global stock variables with database values
+            maizeStock = data.maize_stock;
+            papersStock = data.papers_stock;
+            bagsStock = data.bags_stock;
+            
+            // Refresh the table view
+            updateStock();
+        } else {
+            console.error('Failed to fetch stock summary');
+        }
+    } catch (error) {
+        console.error('Network error while fetching stock:', error);
+    }
+}
+
+// Run loadStock automatically as soon as the HTML document is fully loaded
+document.addEventListener('DOMContentLoaded', loadStock);
 </script>
 </body>
 </html>
