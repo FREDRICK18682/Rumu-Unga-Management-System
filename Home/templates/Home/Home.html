@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hekima Group Holding Limited - Milling Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Top Header with Company Name -->
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight flex items-center gap-3">
+                    <i class="fa-solid fa-industry text-emerald-500"></i> Hekima Group Holding Limited
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Maize Milling Operations & Management Dashboard</p>
+            </div>
+            <div class="text-sm bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-user-shield text-emerald-400"></i> Admin Portal
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area with 7 Application Navigation Cards -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-slate-900">System Applications</h2>
+            <p class="text-sm text-slate-500">Select an application module below to navigate and manage your system.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- 1. Inventory App -->
+            <a href="/inventory/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-emerald-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition">Inventory</h3>
+                    <p class="text-xs text-slate-500 mt-1">Manage maize bags, unga bales, and packaging stocks.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-emerald-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 2. Procurement App -->
+            <a href="/procurement/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-blue-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-blue-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition">Procurement</h3>
+                    <p class="text-xs text-slate-500 mt-1">Handle raw material purchases and supplier orders.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-blue-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 3. Maintenance App -->
+            <a href="/maintenance/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-amber-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-amber-600 transition">Maintenance</h3>
+                    <p class="text-xs text-slate-500 mt-1">Track company machinery status and servicing schedules.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-amber-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 4. Sales App -->
+            <a href="/sales/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-cash-register"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition">Sales</h3>
+                    <p class="text-xs text-slate-500 mt-1">Process customer orders, unga dispatches, and sales records.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-indigo-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 5. Finances App -->
+            <a href="/finances/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-violet-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-violet-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-violet-600 transition">Finances</h3>
+                    <p class="text-xs text-slate-500 mt-1">Monitor cash flow, revenue tracking, and account balances.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-violet-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 6. Expense App -->
+            <a href="/expense/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-rose-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-rose-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-rose-600 transition">Expense</h3>
+                    <p class="text-xs text-slate-500 mt-1">Log and track operational overheads, utility bills, and costs.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-rose-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- 7. Reports App -->
+            <a href="/reports/" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-teal-500 hover:shadow-md transition group flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:bg-teal-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-teal-600 transition">Reports</h3>
+                    <p class="text-xs text-slate-500 mt-1">Generate comprehensive business performance analytics.</p>
+                </div>
+                <div class="mt-6 flex items-center text-xs font-semibold text-teal-600 gap-1">
+                    Open Module <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer with Developer and Contact Info -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+            <p>&copy; 2026 <span class="text-white font-semibold">Hekima Group Holding Limited</span>. All rights reserved.</p>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-envelope text-emerald-400"></i>
+                <span>Support Email: <a href="mailto:support@hekimagroup.com" class="text-slate-200 hover:underline">support@hekimagroup.com</a></span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

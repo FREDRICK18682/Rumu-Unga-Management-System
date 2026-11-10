@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Inventory - Milling Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
+
+    <!-- Top Header -->
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold tracking-tight">
+                Store Inventory
+            </h1>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition duration-150 flex items-center gap-2 border border-slate-700">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <button onclick="openModal('balesModal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium shadow-sm transition duration-150 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle"></i> Add Bales
+                </button>
+                <button onclick="openModal('machineryModal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium shadow-sm transition duration-150 flex items-center gap-2">
+                    <i class="fa-solid fa-gears"></i> Add Machinery
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- 4 Core Inventory Metric Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Maize Bags Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Maize Bags in Store</p>
+                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="maizeCount">1,250</h3>
+                    <p class="text-xs text-slate-500 mt-1">Standard 90kg Bags</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-wheat-awn"></i>
+                </div>
+            </div>
+
+            <!-- Unga Bales Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Unga Bales in Store</p>
+                    <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="ungaCount">840</h3>
+                    <p class="text-xs text-slate-500 mt-1">Finished Product Bales</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+            </div>
+
+            <!-- Packaging Papers Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Packaging Papers</p>
+                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="papersCount">4,500</h3>
+                    <p class="text-xs text-slate-500 mt-1">2kg Packet Papers</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-scroll"></i>
+                </div>
+            </div>
+
+            <!-- Packaging Bags Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Packaging Bags</p>
+                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="bagsCount">3,200</h3>
+                    <p class="text-xs text-slate-500 mt-1">50kg Bulk Woven Bags</p>
+                </div>
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section 2: Company Machinery Status -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-industry text-slate-600"></i> Company-Owned Machinery
+                </h2>
+                <p class="text-xs text-slate-500">Operational status of all heavy equipment.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-semibold tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3.5 px-6">Machine Name</th>
+                            <th class="py-3.5 px-6">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200" id="machineryTableBody">
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
+                                <i class="fa-solid fa-gear text-slate-400"></i> Main Roller Mill #1
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
+                                <i class="fa-solid fa-gear text-slate-400"></i> Heavy Duty Cleaner & De-stoner
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
+                                <i class="fa-solid fa-gear text-slate-400"></i> Automatic Flour Packaging Line
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal 1: Add Bales -->
+    <div id="balesModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-box text-emerald-600"></i> Add Unga Bales
+                </h3>
+                <button onclick="closeModal('balesModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="submitBales(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Number of Bales</label>
+                    <input type="number" id="balesInput" required min="1" placeholder="e.g. 50" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Packets KG (e.g., 2kg)</label>
+                    <input type="text" id="packetsKgInput" required placeholder="e.g. 2kg" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('balesModal')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500">Add to Store</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Add Machinery -->
+    <div id="machineryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-blue-600"></i> Add New Machinery
+                </h3>
+                <button onclick="closeModal('machineryModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="submitMachinery(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Machine Name</label>
+                    <input type="text" id="machineName" required placeholder="e.g. Maize Huller #2" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status</label>
+                    <select id="machineStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Operational">Operational</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('machineryModal')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500">Save Machine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modals and Actions -->
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function submitBales(event) {
+            event.preventDefault();
+            const qty = parseInt(document.getElementById('balesInput').value) || 0;
+            const currentElement = document.getElementById('ungaCount');
+            const currentCount = parseInt(currentElement.innerText.replace(',', '')) || 0;
+            currentElement.innerText = (currentCount + qty).toLocaleString();
+            closeModal('balesModal');
+            document.getElementById('balesInput').value = '';
+            document.getElementById('packetsKgInput').value = '';
+        }
+
+        function submitMachinery(event) {
+            event.preventDefault();
+            const name = document.getElementById('machineName').value;
+            const status = document.getElementById('machineStatus').value;
+
+            const statusBadge = status === 'Operational' 
+                ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational</span>'
+                : '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance</span>';
+
+            const tbody = document.getElementById('machineryTableBody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'hover:bg-slate-50';
+            newRow.innerHTML = `
+                <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
+                    <i class="fa-solid fa-gear text-slate-400"></i> ${name}
+                </td>
+                <td class="py-4 px-6">
+                    ${statusBadge}
+                </td>
+            `;
+            tbody.appendChild(newRow);
+
+            closeModal('machineryModal');
+            document.getElementById('machineName').value = '';
+        }
+    </script>
+</body>
+</html>
