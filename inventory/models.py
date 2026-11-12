@@ -21,5 +21,5 @@ class CompanyMachinery(models.Model):
     status = models.CharField(max_length=100,
                               choices=STATUS_CHOICES,
                               default="Operational")
-    def __srt__(self):
+    def __str__(self):
         return f"{self.machinery_name} - {self.status}"

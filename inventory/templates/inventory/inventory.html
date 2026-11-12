@@ -11,6 +11,17 @@
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
 
+    <!-- Success Notification Toast (Hidden by default) -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-emerald-600 text-white px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 border border-emerald-500">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <div>
+                <p class="font-semibold text-sm" id="toastTitle">Success</p>
+                <p class="text-xs text-emerald-100" id="toastMessage">Data saved successfully.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Header -->
     <header class="bg-slate-900 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -55,6 +66,7 @@
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Unga Bales in Store</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="ungaCount">0</p>
                     <p class="text-xs text-slate-500 mt-1">Finished Product Bales</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xl">
@@ -79,7 +91,7 @@
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Packaging Bags</p>
                     <p class="text-2xl font-bold text-slate-900 mt-1" id="bagsCount">0</p>
-                    <p class="text-xs text-slate-500 mt-1">Bags to rap a bale</p>
+                    <p class="text-xs text-slate-500 mt-1">Bags to wrap a bale</p>
                 </div>
                 <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center text-xl">
                     <i class="fa-solid fa-bag-shopping"></i>
@@ -103,39 +115,11 @@
                         <tr>
                             <th class="py-3.5 px-6">Machine Name</th>
                             <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200" id="machineryTableBody">
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                                <i class="fa-solid fa-gear text-slate-400"></i> Main Roller Mill #1
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                                <i class="fa-solid fa-gear text-slate-400"></i> Heavy Duty Cleaner & De-stoner
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                                <i class="fa-solid fa-gear text-slate-400"></i> Automatic Flour Packaging Line
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max">
-                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance
-                                </span>
-                            </td>
-                        </tr>
+                        <!-- Dynamic rows will be loaded here from the database API -->
                     </tbody>
                 </table>
             </div>
@@ -152,7 +136,7 @@
                 </h3>
                 <button onclick="closeModal('balesModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form onsubmit="submitBales(event)" class="space-y-4">
+            <form id="balesForm" onsubmit="submitBales(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Number of Bales</label>
                     <input type="number" id="balesInput" required min="1" placeholder="e.g. 50" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
@@ -178,7 +162,7 @@
                 </h3>
                 <button onclick="closeModal('machineryModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form onsubmit="submitMachinery(event)" class="space-y-4">
+            <form id="machineryForm" onsubmit="submitMachinery(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Machine Name</label>
                     <input type="text" id="machineName" required placeholder="e.g. Maize Huller #2" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -199,152 +183,291 @@
         </div>
     </div>
 
-    <!-- JavaScript for Modals and Actions -->
+    <!-- Modal 3: Edit Machinery -->
+    <div id="editMachineryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-amber-600"></i> Edit Machinery
+                </h3>
+                <button onclick="closeModal('editMachineryModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="editMachineryForm" onsubmit="submitEditMachinery(event)" class="space-y-4">
+                <input type="hidden" id="editMachineId">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Machine Name</label>
+                    <input type="text" id="editMachineName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status</label>
+                    <select id="editMachineStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="Operational">Operational</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                        <option value="Damaged">Damaged</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('editMachineryModal')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-500">Update Machine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modals, Toast Notifications, and Actions -->
     <script>
         // CSRF token helper for Django
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Show success notification banner for 3.5 seconds
+        let toastTimeout;
+        function showToast(title, message) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMessage').innerText = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        // Function to fetch total bales sum from API and display it
+        async function loadBalesStock() {
+            try {
+                const response = await fetch('/inventory/api/stock/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const total = data.bales_stock || 0;
+                    document.getElementById('ungaCount').innerText = total.toLocaleString();
+                } else {
+                    console.error('Failed to fetch bales stock');
+                }
+            } catch (error) {
+                console.error('Network error while connecting to bales API:', error);
             }
         }
-    }
-    return cookieValue;
-}
 
-function openModal(id) {
-    document.getElementById(id).classList.remove('hidden');
-}
+        // Function to fetch company machinery from API and render the table with Edit buttons
+        async function loadMachineryTable() {
+            try {
+                const response = await fetch('/inventory/api/machinary/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const tbody = document.getElementById('machineryTableBody');
+                    tbody.innerHTML = ''; // Clear existing rows
 
-function closeModal(id) {
-    document.getElementById(id).classList.add('hidden');
-}
+                    data.machinary.forEach(machine => {
+                        let statusBadge = '';
+                        if (machine.status === 'Operational') {
+                            statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational</span>';
+                        } else if (machine.status === 'Under Maintenance') {
+                            statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance</span>';
+                        } else {
+                            statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-red-500"></span> Damaged</span>';
+                        }
 
-// Function to handle saving Unga Bales to the database, updating the card, and closing the modal
-async function submitBales(event) {
-    event.preventDefault();
-    
-    const qty = parseInt(document.getElementById('balesInput').value) || 0;
-    const packetsKg = document.getElementById('packetsKgInput').value;
+                        // Use machine.id or machine.pk (adjust based on your Django model primary key field name)
+                        const machineId = machine.id || machine.pk || '';
 
-    const formData = {
-        number_of_bales: qty,
-        packets_kg: packetsKg
-    };
+                        const newRow = document.createElement('tr');
+                        newRow.className = 'hover:bg-slate-50';
+                        newRow.innerHTML = `
+                            <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
+                                <i class="fa-solid fa-gear text-slate-400"></i> ${machine.machinery_name}
+                            </td>
+                            <td class="py-4 px-6">
+                                ${statusBadge}
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button onclick="openEditModal('${machineId}', '${escapeHtml(machine.machinery_name)}', '${machine.status}')" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-xs font-semibold transition border border-amber-200 flex items-center gap-1.5 ml-auto">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(newRow);
+                    });
+                } else {
+                    console.error('Failed to fetch machinery list');
+                }
+            } catch (error) {
+                console.error('Network error while connecting to machinery API:', error);
+            }
+        }
 
-    try {
-        const response = await fetch('/inventory/api/ungabales/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify(formData)
+        // Helper to prevent HTML injection in inline attributes
+        function escapeHtml(text) {
+            return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Open Edit Modal and pre-fill data
+        function openEditModal(id, name, status) {
+            document.getElementById('editMachineId').value = id;
+            document.getElementById('editMachineName').value = name;
+            document.getElementById('editMachineStatus').value = status;
+            openModal('editMachineryModal');
+        }
+
+        // Save Unga Bales
+        async function submitBales(event) {
+            event.preventDefault();
+            
+            const qty = parseInt(document.getElementById('balesInput').value) || 0;
+            const packetsKg = document.getElementById('packetsKgInput').value;
+
+            const formData = {
+                number_of_bales: qty,
+                packets_kg: packetsKg
+            };
+
+            try {
+                const response = await fetch('/inventory/api/ungabales/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('balesForm').reset();
+                    closeModal('balesModal');
+                    await loadBalesStock();
+                    showToast('Bales Added!', `${qty} bales (${packetsKg}) saved successfully to inventory.`);
+                } else {
+                    const errData = await response.json();
+                    alert('Error saving bales: ' + JSON.stringify(errData));
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                alert('Failed to connect to the server.');
+            }
+        }
+
+        // Save New Machinery
+        async function submitMachinery(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('machineName').value;
+            const status = document.getElementById('machineStatus').value;
+
+            const formData = {
+                machinery_name: name,
+                status: status
+            };
+
+            try {
+                const response = await fetch('/inventory/api/companymachinery/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('machineryForm').reset();
+                    closeModal('machineryModal');
+                    await loadMachineryTable();
+                    showToast('Machinery Saved!', `"${name}" was added successfully.`);
+                } else {
+                    const errData = await response.json();
+                    alert('Error saving machine: ' + JSON.stringify(errData));
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                alert('Failed to connect to the server.');
+            }
+        }
+
+        // Submit Edited Machinery (PUT or PATCH request to your API)
+        async function submitEditMachinery(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('editMachineId').value;
+            const name = document.getElementById('editMachineName').value;
+            const status = document.getElementById('editMachineStatus').value;
+
+            const formData = {
+                machinery_name: name,
+                status: status
+            };
+
+            try {
+                // Adjust endpoint URL if your update API route differs (e.g. `/inventory/api/companymachinery/${id}/`)
+                const response = await fetch(`/inventory/api/companymachinery/${id}/`, {
+                    method: 'PUT', // or 'PATCH' depending on your Django view setup
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    closeModal('editMachineryModal');
+                    await loadMachineryTable();
+                    showToast('Machinery Updated!', `"${name}" was updated successfully.`);
+                } else {
+                    const errData = await response.json();
+                    alert('Error updating machine: ' + JSON.stringify(errData));
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                alert('Failed to connect to the server.');
+            }
+        }
+
+        // Fetch and display stock data from procurement API
+        async function loadInventoryStock() {
+            try {
+                const response = await fetch('/procurement/api/stock/');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('maizeCount').innerText = (data.maize_stock || 0).toLocaleString();
+                    document.getElementById('papersCount').innerText = (data.papers_stock || 0).toLocaleString();
+                    document.getElementById('bagsCount').innerText = (data.bags_stock || 0).toLocaleString();
+                } else {
+                    console.error('Failed to fetch stock from API');
+                }
+            } catch (error) {
+                console.error('Network error while connecting to API:', error);
+            }
+        }
+
+        // Run fetch functions when the page fully loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInventoryStock();
+            loadBalesStock();
+            loadMachineryTable();
         });
-
-        if (response.ok) {
-            // Update the Unga Bales card count on screen immediately
-            const currentElement = document.getElementById('ungaCount');
-            const currentCount = parseInt(currentElement.innerText.replace(',', '')) || 0;
-            currentElement.innerText = (currentCount + qty).toLocaleString();
-
-            // Close the modal (makes it disappear)
-            closeModal('balesModal');
-            
-            // Clear inputs
-            document.getElementById('balesInput').value = '';
-            document.getElementById('packetsKgInput').value = '';
-        } else {
-            const errData = await response.json();
-            alert('Error saving bales: ' + JSON.stringify(errData));
-        }
-    } catch (error) {
-        console.error('Network error:', error);
-        alert('Failed to connect to the server.');
-    }
-}
-
-// Function to handle saving Machinery to the database, adding to the table, and closing the modal
-async function submitMachinery(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('machineName').value;
-    const status = document.getElementById('machineStatus').value;
-
-    const formData = {
-        machine_name: name,
-        status: status
-    };
-
-    try {
-        const response = await fetch('/inventory/api/companymachinery/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify(formData)
-        });
-
-        if (response.ok) {
-            const statusBadge = status === 'Operational' 
-                ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational</span>'
-                : '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance</span>';
-
-            const tbody = document.getElementById('machineryTableBody');
-            const newRow = document.createElement('tr');
-            newRow.className = 'hover:bg-slate-50';
-            newRow.innerHTML = `
-                <td class="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                    <i class="fa-solid fa-gear text-slate-400"></i> ${name}
-                </td>
-                <td class="py-4 px-6">
-                    ${statusBadge}
-                </td>
-            `;
-            tbody.appendChild(newRow);
-
-            // Close the modal (makes it disappear)
-            closeModal('machineryModal');
-            
-            // Clear input
-            document.getElementById('machineName').value = '';
-        } else {
-            const errData = await response.json();
-            alert('Error saving machine: ' + JSON.stringify(errData));
-        }
-    } catch (error) {
-        console.error('Network error:', error);
-        alert('Failed to connect to the server.');
-    }
-}
-
-// Function to fetch and display stock data from the procurement API
-async function loadInventoryStock() {
-    try {
-        const response = await fetch('/procurement/api/stock/');
-        
-        if (response.ok) {
-            const data = await response.json();
-            
-            document.getElementById('maizeCount').innerText = (data.maize_stock || 0).toLocaleString();
-            document.getElementById('papersCount').innerText = (data.papers_stock || 0).toLocaleString();
-            document.getElementById('bagsCount').innerText = (data.bags_stock || 0).toLocaleString();
-        } else {
-            console.error('Failed to fetch stock from API');
-        }
-    } catch (error) {
-        console.error('Network error while connecting to API:', error);
-    }
-}
-
-// Automatically run the fetch function as soon as the page fully loads
-document.addEventListener('DOMContentLoaded', loadInventoryStock);
     </script>
 </body>
 </html>
