@@ -8,6 +8,6 @@ class UngaInventorySerializer(serializers.ModelSerializer):
 
 class CompanyMachinerySerializer(serializers.ModelSerializer):
     class Meta:
-        mode = CompanyMachinery
+        model = CompanyMachinery
         fields = '__all__'
 

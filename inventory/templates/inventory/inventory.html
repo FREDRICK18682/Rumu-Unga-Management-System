@@ -20,7 +20,7 @@
             
             <!-- Action Buttons -->
             <div class="flex items-center gap-3">
-                <a href="#" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition duration-150 flex items-center gap-2 border border-slate-700">
+                <a href="{% url 'Home:index' %}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition duration-150 flex items-center gap-2 border border-slate-700">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
                 <button onclick="openModal('balesModal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium shadow-sm transition duration-150 flex items-center gap-2">
@@ -43,7 +43,7 @@
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Maize Bags in Store</p>
-                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="maizeCount">1,250</h3>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="maizeCount">0</p>
                     <p class="text-xs text-slate-500 mt-1">Standard 90kg Bags</p>
                 </div>
                 <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-xl">
@@ -55,7 +55,6 @@
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Unga Bales in Store</p>
-                    <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="ungaCount">840</h3>
                     <p class="text-xs text-slate-500 mt-1">Finished Product Bales</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xl">
@@ -67,8 +66,8 @@
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Packaging Papers</p>
-                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="papersCount">4,500</h3>
-                    <p class="text-xs text-slate-500 mt-1">2kg Packet Papers</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="papersCount">0</p>
+                    <p class="text-xs text-slate-500 mt-1">2kg and 1kg Packet Papers</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xl">
                     <i class="fa-solid fa-scroll"></i>
@@ -79,8 +78,8 @@
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Packaging Bags</p>
-                    <h3 class="text-3xl font-extrabold text-slate-900 mt-2" id="bagsCount">3,200</h3>
-                    <p class="text-xs text-slate-500 mt-1">50kg Bulk Woven Bags</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="bagsCount">0</p>
+                    <p class="text-xs text-slate-500 mt-1">Bags to rap a bale</p>
                 </div>
                 <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center text-xl">
                     <i class="fa-solid fa-bag-shopping"></i>
@@ -189,6 +188,7 @@
                     <select id="machineStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="Operational">Operational</option>
                         <option value="Under Maintenance">Under Maintenance</option>
+                        <option value="Damaged">Damaged</option>
                     </select>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
@@ -201,30 +201,97 @@
 
     <!-- JavaScript for Modals and Actions -->
     <script>
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
+        // CSRF token helper for Django
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
+    }
+    return cookieValue;
+}
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
+function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+}
 
-        function submitBales(event) {
-            event.preventDefault();
-            const qty = parseInt(document.getElementById('balesInput').value) || 0;
+function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+// Function to handle saving Unga Bales to the database, updating the card, and closing the modal
+async function submitBales(event) {
+    event.preventDefault();
+    
+    const qty = parseInt(document.getElementById('balesInput').value) || 0;
+    const packetsKg = document.getElementById('packetsKgInput').value;
+
+    const formData = {
+        number_of_bales: qty,
+        packets_kg: packetsKg
+    };
+
+    try {
+        const response = await fetch('/inventory/api/ungabales/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            // Update the Unga Bales card count on screen immediately
             const currentElement = document.getElementById('ungaCount');
             const currentCount = parseInt(currentElement.innerText.replace(',', '')) || 0;
             currentElement.innerText = (currentCount + qty).toLocaleString();
+
+            // Close the modal (makes it disappear)
             closeModal('balesModal');
+            
+            // Clear inputs
             document.getElementById('balesInput').value = '';
             document.getElementById('packetsKgInput').value = '';
+        } else {
+            const errData = await response.json();
+            alert('Error saving bales: ' + JSON.stringify(errData));
         }
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('Failed to connect to the server.');
+    }
+}
 
-        function submitMachinery(event) {
-            event.preventDefault();
-            const name = document.getElementById('machineName').value;
-            const status = document.getElementById('machineStatus').value;
+// Function to handle saving Machinery to the database, adding to the table, and closing the modal
+async function submitMachinery(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('machineName').value;
+    const status = document.getElementById('machineStatus').value;
 
+    const formData = {
+        machine_name: name,
+        status: status
+    };
+
+    try {
+        const response = await fetch('/inventory/api/companymachinery/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
             const statusBadge = status === 'Operational' 
                 ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operational</span>'
                 : '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1.5 w-max"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Under Maintenance</span>';
@@ -242,9 +309,42 @@
             `;
             tbody.appendChild(newRow);
 
+            // Close the modal (makes it disappear)
             closeModal('machineryModal');
+            
+            // Clear input
             document.getElementById('machineName').value = '';
+        } else {
+            const errData = await response.json();
+            alert('Error saving machine: ' + JSON.stringify(errData));
         }
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('Failed to connect to the server.');
+    }
+}
+
+// Function to fetch and display stock data from the procurement API
+async function loadInventoryStock() {
+    try {
+        const response = await fetch('/procurement/api/stock/');
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            document.getElementById('maizeCount').innerText = (data.maize_stock || 0).toLocaleString();
+            document.getElementById('papersCount').innerText = (data.papers_stock || 0).toLocaleString();
+            document.getElementById('bagsCount').innerText = (data.bags_stock || 0).toLocaleString();
+        } else {
+            console.error('Failed to fetch stock from API');
+        }
+    } catch (error) {
+        console.error('Network error while connecting to API:', error);
+    }
+}
+
+// Automatically run the fetch function as soon as the page fully loads
+document.addEventListener('DOMContentLoaded', loadInventoryStock);
     </script>
 </body>
 </html>

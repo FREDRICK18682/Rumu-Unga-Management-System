@@ -19,7 +19,7 @@
     <!-- TWO MAIN BUTTONS -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
-        <button onclick=""
+        <button onclick="window.location.href='{% url 'Home:index' %}'"
             class="bg-green-600 hover:bg-green-700 text-white p-5 rounded-lg shadow font-bold text-lg">
             Home Page
         </button>
@@ -394,7 +394,7 @@ document.getElementById("packagingPurchaseForm").addEventListener("submit", asyn
     }
 });
 
-// Function to fetch current stock from the database on page load
+// Function to fetch current stock from the database and load it on the page
 async function loadStock() {
     try {
         const response = await fetch('/procurement/api/stock/');

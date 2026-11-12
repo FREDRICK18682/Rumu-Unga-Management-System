@@ -22,4 +22,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='Home/', permanent=False)),
     path('procurement/', include('procurement.urls')),
     path('Home/', include('Home.urls')),
+    path('inventory/', include('inventory.urls'))
 ]
