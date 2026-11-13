@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unga Millers — Daily Sales Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-emerald-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Grain / Milling Emblem SVG -->
+        <div class="bg-amber-400 text-emerald-950 p-2.5 rounded-xl shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-15c-3.5 0-6 2.5-6 6 3.5 0 6-2.5 6-6zm0 0c3.5 0 6 2.5 6 6-3.5 0-6-2.5-6-6zm0 6c-3.5 0-6 2.5-6 6 3.5 0 6-2.5 6-6zm0 0c3.5 0 6 2.5 6 6-3.5 0-6-2.5-6-6z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight leading-tight">Unga SALES</h1>
+          <p class="text-emerald-200 text-xs sm:text-sm" id="current-date-display">Loading date...</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+         <button
+          type="button"
+          onclick="window.location.href='{% url 'Home:index' %}'"
+          class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
+          HOME
+        </button>
+        <button
+          id="btn-open-reset-modal"
+          type="button"
+          class="inline-flex items-center gap-1.5 bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Reset Day
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 space-y-6">
+
+    <!-- KPI Summary Cards (3 Cards now) -->
+    <section aria-label="Sales Summary" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+      
+      <!-- Total Bales Sold -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Bales Sold</p>
+          <p id="kpi-total-bales" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1.5 tabular-nums">0</p>
+          <p class="text-xs text-emerald-700 font-medium mt-1">Dispatched & paid today</p>
+        </div>
+        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Total Money Collected -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Money Collected</p>
+          <p id="kpi-total-money" class="text-2xl sm:text-3xl font-bold text-emerald-700 mt-1.5 tabular-nums">KES 0</p>
+          <p class="text-xs text-slate-500 mt-1">Gross daily revenue</p>
+        </div>
+        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Unpaid Bales / Credit Card (New) -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales (Credit)</p>
+          <p id="kpi-unpaid-bales" class="text-2xl sm:text-3xl font-bold text-rose-700 mt-1.5 tabular-nums">0 bales</p>
+          <p id="kpi-unpaid-value" class="text-xs text-slate-600 font-medium mt-1">Value: KES 0</p>
+        </div>
+        <div class="p-3 bg-rose-100 text-rose-700 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Forms Container (Side by Side or Stacked) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Form 1: Record Paid Sale -->
+      <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="bg-emerald-950 text-white px-6 py-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold">Record Paid Sale</h2>
+            <p class="text-xs text-emerald-300">Enter bales sold & money collected</p>
+          </div>
+
+        </div>
+
+        <form id="sale-form" class="p-6 space-y-4">
+          <!-- Product Type -->
+          <div>
+            <label for="product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Product / Grade</label>
+            <select
+              id="product-type"
+              name="productType"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+            >
+              <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Maize (12 × 2kg) — Ref: 1,600</option>
+              <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Maize (24 × 1kg) — Ref: 1,600</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Number of Bales Sold -->
+            <div>
+              <label for="bales-sold" class="block text-sm font-medium text-slate-700 mb-1">
+                Number of Bales Sold <span class="text-rose-600">*</span>
+              </label>
+              <input
+                type="number"
+                id="bales-sold"
+                name="balesSold"
+                min="1"
+                step="1"
+                required
+                placeholder="e.g., 25"
+                class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 tabular-nums"
+              />
+            </div>
+
+            <!-- Amount of Money Collected -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="amount-collected" class="block text-sm font-medium text-slate-700">
+                  Money Collected (KES) <span class="text-rose-600">*</span>
+                </label>
+                <span id="rate-hint" class="text-xs text-emerald-700 font-medium">Auto-fills</span>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-sm font-semibold pointer-events-none">KES</span>
+                <input
+                  type="number"
+                  id="amount-collected"
+                  name="amountCollected"
+                  min="1"
+                  step="any"
+                  required
+                  placeholder="e.g., 40000"
+                  class="w-full rounded-xl border border-slate-300 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-normal focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 tabular-nums"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Payment Method</label>
+            <div class="grid grid-cols-2 gap-2.5">
+              <label class="cursor-pointer">
+                <input type="radio" name="paymentMethod" value="M-Pesa" checked class="peer sr-only" />
+                <div class="text-center py-2.5 px-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-800 transition">
+                  M-Pesa
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="paymentMethod" value="Cash" class="peer sr-only" />
+                <div class="text-center py-2.5 px-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 transition">
+                  Cash
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div id="form-error" class="hidden rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-xs text-rose-700 font-medium"></div>
+
+          <button
+            type="submit"
+            class="w-full bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-semibold py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            Record Paid Sale
+          </button>
+        </form>
+      </section>
+
+      <!-- Form 2: Record Unpaid Bales (Credit) -->
+      <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="bg-rose-900 text-white px-6 py-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold">Record Unpaid Bales (Credit)</h2>
+            <p class="text-xs text-rose-200">Enter bales taken on credit/not yet paid</p>
+          </div>
+        </div>
+
+        <form id="credit-form" class="p-6 space-y-4">
+          <!-- Product Type -->
+          <div>
+            <label for="credit-product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Product / Grade</label>
+            <select
+              id="credit-product-type"
+              name="creditProductType"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20"
+            >
+              <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Maize (12 × 2kg) — Ref: 1,600</option>
+              <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Maize (24 × 1kg) — Ref: 1,600</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Number of Bales Taken -->
+            <div>
+              <label for="credit-bales-sold" class="block text-sm font-medium text-slate-700 mb-1">
+                Number of Bales Taken <span class="text-rose-600">*</span>
+              </label>
+              <input
+                type="number"
+                id="credit-bales-sold"
+                name="creditBalesSold"
+                min="1"
+                step="1"
+                required
+                placeholder="e.g., 10"
+                class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20 tabular-nums"
+              />
+            </div>
+
+            <!-- Total Cost Expected -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="credit-amount-collected" class="block text-sm font-medium text-slate-700">
+                  Total Value (KES) <span class="text-rose-600">*</span>
+                </label>
+                <span id="credit-rate-hint" class="text-xs text-rose-700 font-medium">Auto-fills</span>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-sm font-semibold pointer-events-none">KES</span>
+                <input
+                  type="number"
+                  id="credit-amount-collected"
+                  name="creditAmountCollected"
+                  min="1"
+                  step="any"
+                  required
+                  placeholder="e.g., 16000"
+                  class="w-full rounded-xl border border-slate-300 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-normal focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20 tabular-nums"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Status note -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Payment Status</label>
+            <div class="py-2.5 px-3 rounded-xl border border-rose-200 bg-rose-50 text-xs font-semibold text-rose-800">
+              Pending Payment (Credit)
+            </div>
+          </div>
+
+          <div id="credit-form-error" class="hidden rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-xs text-rose-700 font-medium"></div>
+
+          <button
+            type="submit"
+            class="w-full bg-rose-700 hover:bg-rose-800 active:bg-rose-900 text-white font-semibold py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            Record Unpaid Credit
+          </button>
+        </form>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Custom Reset Confirmation Modal -->
+  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+      <div class="flex items-center gap-3 text-rose-600 mb-3">
+        <div class="p-2.5 bg-rose-100 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">Reset Daily Sales & Credit?</h3>
+      </div>
+      <p class="text-sm text-slate-600 leading-relaxed">
+        This will permanently clear all recorded paid sales and unpaid credit balances for today.
+      </p>
+      <div class="mt-6 flex items-center justify-end gap-3">
+        <button
+          id="btn-cancel-reset"
+          type="button"
+          class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          id="btn-confirm-reset"
+          type="button"
+          class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-sm font-semibold text-white transition cursor-pointer"
+        >
+          Yes, Clear All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 bg-emerald-950 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium border border-emerald-800">
+    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+    <span id="toast-message">Sale recorded!</span>
+  </div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY_SALES = 'unga_miller_sales_v1';
+      const STORAGE_KEY_CREDIT = 'unga_miller_credit_v1';
+
+      // State
+      let sales = loadStorage(STORAGE_KEY_SALES);
+      let creditSales = loadStorage(STORAGE_KEY_CREDIT);
+
+      let manualAmountEdited = false;
+      let creditManualAmountEdited = false;
+
+      // DOM Elements
+      const dateDisplay = document.getElementById('current-date-display');
+      const kpiTotalBales = document.getElementById('kpi-total-bales');
+      const kpiTotalMoney = document.getElementById('kpi-total-money');
+      const kpiUnpaidBales = document.getElementById('kpi-unpaid-bales');
+      const kpiUnpaidValue = document.getElementById('kpi-unpaid-value');
+
+      // Form 1 Elements
+      const saleForm = document.getElementById('sale-form');
+      const productSelect = document.getElementById('product-type');
+      const balesInput = document.getElementById('bales-sold');
+      const amountInput = document.getElementById('amount-collected');
+      const customerInput = document.getElementById('customer-name');
+      const rateHint = document.getElementById('rate-hint');
+      const formError = document.getElementById('form-error');
+
+      // Form 2 Elements (Credit)
+      const creditForm = document.getElementById('credit-form');
+      const creditProductSelect = document.getElementById('credit-product-type');
+      const creditBalesInput = document.getElementById('credit-bales-sold');
+      const creditAmountInput = document.getElementById('credit-amount-collected');
+      const creditCustomerInput = document.getElementById('credit-customer-name');
+      const creditRateHint = document.getElementById('credit-rate-hint');
+      const creditFormError = document.getElementById('credit-form-error');
+
+      const btnOpenResetModal = document.getElementById('btn-open-reset-modal');
+      const resetModal = document.getElementById('reset-modal');
+      const btnCancelReset = document.getElementById('btn-cancel-reset');
+      const btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      let toastTimer = null;
+
+      // Formatters
+      const formatNumber = (num) => new Intl.NumberFormat('en-KE').format(Math.round(num));
+      const formatKES = (num) => `KES ${new Intl.NumberFormat('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(num)}`;
+
+      // Set current date
+      const now = new Date();
+      dateDisplay.textContent = now.toLocaleDateString('en-KE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      function loadStorage(key) {
+        try {
+          const saved = localStorage.getItem(key);
+          if (saved !== null) {
+            return JSON.parse(saved);
+          }
+        } catch (e) {
+          console.error('Failed to read localStorage:', e);
+        }
+        return [];
+      }
+
+      function saveStorage(key, data) {
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+          console.error('Failed to save to localStorage:', e);
+        }
+      }
+
+      function showToast(msg) {
+        toastMessage.textContent = msg;
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.add('hidden');
+          toast.classList.remove('flex');
+        }, 3000);
+      }
+
+      // Auto-calculate Form 1 amount
+      function updateSuggestedAmount() {
+        const bales = parseFloat(balesInput.value);
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
+
+        if (!isNaN(bales) && bales > 0 && !manualAmountEdited) {
+          amountInput.value = bales * rate;
+          rateHint.textContent = `@ ${formatNumber(rate)} / bale`;
+        } else if (isNaN(bales) || bales <= 0) {
+          if (!manualAmountEdited) {
+            amountInput.value = '';
+          }
+          rateHint.textContent = `Ref: ${formatNumber(rate)} / bale`;
+        }
+      }
+
+      // Auto-calculate Form 2 (Credit) amount
+      function updateCreditSuggestedAmount() {
+        const bales = parseFloat(creditBalesInput.value);
+        const selectedOption = creditProductSelect.options[creditProductSelect.selectedIndex];
+        const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
+
+        if (!isNaN(bales) && bales > 0 && !creditManualAmountEdited) {
+          creditAmountInput.value = bales * rate;
+          creditRateHint.textContent = `@ ${formatNumber(rate)} / bale`;
+        } else if (isNaN(bales) || bales <= 0) {
+          if (!creditManualAmountEdited) {
+            creditAmountInput.value = '';
+          }
+          creditRateHint.textContent = `Ref: ${formatNumber(rate)} / bale`;
+        }
+      }
+
+      // Event listeners for Form 1
+      balesInput.addEventListener('input', () => {
+        if (amountInput.value === '') manualAmountEdited = false;
+        updateSuggestedAmount();
+      });
+      productSelect.addEventListener('change', () => {
+        manualAmountEdited = false;
+        updateSuggestedAmount();
+      });
+      amountInput.addEventListener('input', () => {
+        manualAmountEdited = amountInput.value.trim() !== '';
+        rateHint.textContent = manualAmountEdited ? 'Custom amount' : '@ rate';
+      });
+
+      // Event listeners for Form 2 (Credit)
+      creditBalesInput.addEventListener('input', () => {
+        if (creditAmountInput.value === '') creditManualAmountEdited = false;
+        updateCreditSuggestedAmount();
+      });
+      creditProductSelect.addEventListener('change', () => {
+        creditManualAmountEdited = false;
+        updateCreditSuggestedAmount();
+      });
+      creditAmountInput.addEventListener('input', () => {
+        creditManualAmountEdited = creditAmountInput.value.trim() !== '';
+        creditRateHint.textContent = creditManualAmountEdited ? 'Custom amount' : '@ rate';
+      });
+
+      // Render KPIs
+      function renderDashboard() {
+        const totalBales = sales.reduce((sum, item) => sum + Number(item.bales), 0);
+        const totalMoney = sales.reduce((sum, item) => sum + Number(item.amount), 0);
+        
+        const unpaidBalesCount = creditSales.reduce((sum, item) => sum + Number(item.bales), 0);
+        const unpaidTotalValue = creditSales.reduce((sum, item) => sum + Number(item.amount), 0);
+
+        kpiTotalBales.textContent = formatNumber(totalBales);
+        kpiTotalMoney.textContent = formatKES(totalMoney);
+        
+        kpiUnpaidBales.textContent = `${formatNumber(unpaidBalesCount)} bales`;
+        kpiUnpaidValue.textContent = `Value: ${formatKES(unpaidTotalValue)}`;
+      }
+
+      // Form 1 Submission (Paid Sale)
+      saleForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        formError.classList.add('hidden');
+
+        const bales = parseInt(balesInput.value, 10);
+        const amount = parseFloat(amountInput.value);
+        const product = productSelect.value;
+        const customer = customerInput.value.trim() || 'Walk-in Customer';
+        const payment = saleForm.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (isNaN(bales) || bales <= 0) {
+          formError.textContent = 'Please enter a valid number of bales.';
+          formError.classList.remove('hidden');
+          balesInput.focus();
+          return;
+        }
+
+        if (isNaN(amount) || amount <= 0) {
+          formError.textContent = 'Please enter a valid amount collected.';
+          formError.classList.remove('hidden');
+          amountInput.focus();
+          return;
+        }
+
+        const newSale = {
+          id: 'tx-' + Date.now(),
+          time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
+          customer,
+          product,
+          bales,
+          amount,
+          payment
+        };
+
+        sales.unshift(newSale);
+        saveStorage(STORAGE_KEY_SALES, sales);
+        renderDashboard();
+
+        balesInput.value = '';
+        amountInput.value = '';
+        customerInput.value = '';
+        manualAmountEdited = false;
+        updateSuggestedAmount();
+        balesInput.focus();
+
+        showToast(`Recorded ${bales} paid bales (${formatKES(amount)})`);
+      });
+
+      // Form 2 Submission (Credit / Unpaid Bales)
+      creditForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        creditFormError.classList.add('hidden');
+
+        const bales = parseInt(creditBalesInput.value, 10);
+        const amount = parseFloat(creditAmountInput.value);
+        const product = creditProductSelect.value;
+        const customer = creditCustomerInput.value.trim();
+
+        if (isNaN(bales) || bales <= 0) {
+          creditFormError.textContent = 'Please enter a valid number of bales taken.';
+          creditFormError.classList.remove('hidden');
+          creditBalesInput.focus();
+          return;
+        }
+
+        if (isNaN(amount) || amount <= 0) {
+          creditFormError.textContent = 'Please enter a valid total value.';
+          creditFormError.classList.remove('hidden');
+          creditAmountInput.focus();
+          return;
+        }
+
+        if (!customer) {
+          creditFormError.textContent = 'Please provide a customer or shop name for credit tracking.';
+          creditFormError.classList.remove('hidden');
+          creditCustomerInput.focus();
+          return;
+        }
+
+        const newCreditSale = {
+          id: 'credit-' + Date.now(),
+          time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
+          customer,
+          product,
+          bales,
+          amount,
+          status: 'Unpaid'
+        };
+
+        creditSales.unshift(newCreditSale);
+        saveStorage(STORAGE_KEY_CREDIT, creditSales);
+        renderDashboard();
+
+        creditBalesInput.value = '';
+        creditAmountInput.value = '';
+        creditCustomerInput.value = '';
+        creditManualAmountEdited = false;
+        updateCreditSuggestedAmount();
+        creditBalesInput.focus();
+
+        showToast(`Recorded ${bales} unpaid bales for ${customer}`);
+      });
+
+      // Reset Modal Controls
+      btnOpenResetModal.addEventListener('click', () => {
+        resetModal.classList.remove('hidden');
+        resetModal.classList.add('flex');
+      });
+
+      btnCancelReset.addEventListener('click', () => {
+        resetModal.classList.add('hidden');
+        resetModal.classList.remove('flex');
+      });
+
+      btnConfirmReset.addEventListener('click', () => {
+        sales = [];
+        creditSales = [];
+        saveStorage(STORAGE_KEY_SALES, sales);
+        saveStorage(STORAGE_KEY_CREDIT, creditSales);
+        renderDashboard();
+        resetModal.classList.add('hidden');
+        resetModal.classList.remove('flex');
+        showToast('All daily sales & credit cleared');
+      });
+
+      // Initial render
+      updateSuggestedAmount();
+      updateCreditSuggestedAmount();
+      renderDashboard();
+    })();
+  </script>
+</body>
+</html>
