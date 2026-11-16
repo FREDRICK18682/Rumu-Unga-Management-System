@@ -4,7 +4,7 @@ from .models import UngaBale, CompanyMachinery
 from .serializers import (UngaInventorySerializer, CompanyMachinerySerializer)
 from django.db.models import Sum
 from django.http import JsonResponse
-import json
+import json 
 from django.views.decorators.http import require_http_methods
 
 # Create your views here.

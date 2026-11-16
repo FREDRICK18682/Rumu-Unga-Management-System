@@ -22,7 +22,7 @@
 
   <!-- Top Navigation Bar -->
   <header class="bg-emerald-900 text-white shadow-md sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <!-- Grain / Milling Emblem SVG -->
         <div class="bg-amber-400 text-emerald-950 p-2.5 rounded-xl shadow-sm">
@@ -37,9 +37,11 @@
       </div>
 
       <div class="flex items-center gap-2.5">
-         <a href="{% url 'Home:index' %}"
-         class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
-        Home</a>
+        <a
+          href="{% url 'Home:index' %}"
+          class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
+          Home
+        </a>
         <button
           id="btn-open-reset-modal"
           type="button"
@@ -55,80 +57,123 @@
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 space-y-6">
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 space-y-6">
 
-    <!-- KPI Summary Cards (3 Cards now) -->
-    <section aria-label="Sales Summary" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+    <!-- KPI Summary Cards (5 Cards) -->
+    <section aria-label="Sales Summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       
-      <!-- Total Bales Sold -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+      <!-- 1. Bales in Store -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-200/80 shadow-sm flex items-start justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Bales Sold</p>
-          <p id="kpi-total-bales" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1.5 tabular-nums">0</p>
-          <p class="text-xs text-emerald-700 font-medium mt-1">Dispatched & paid today</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-sky-700">Bales in Store</p>
+          <p id="kpi-store-bales" class="text-2xl font-bold text-slate-900 mt-1.5 tabular-nums">Loading...</p>
+          <p id="kpi-store-subtext" class="text-xs text-slate-500 mt-1">Database inventory</p>
         </div>
-        <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="p-2.5 bg-sky-100 text-sky-700 rounded-xl shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- 2. Total Bales Sold Today -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Bales Sold Today</p>
+          <p id="kpi-total-bales" class="text-2xl font-bold text-slate-900 mt-1.5 tabular-nums">0 bales</p>
+          <p class="text-xs text-emerald-700 font-medium mt-1">Dispatched & paid</p>
+        </div>
+        <div class="p-2.5 bg-amber-100 text-amber-700 rounded-xl shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
         </div>
       </div>
 
-      <!-- Total Money Collected -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+      <!-- 3. Money Collected from Today's Sales -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Money Collected</p>
-          <p id="kpi-total-money" class="text-2xl sm:text-3xl font-bold text-emerald-700 mt-1.5 tabular-nums">KES 0</p>
-          <p class="text-xs text-slate-500 mt-1">Gross daily revenue</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Money Collected</p>
+          <p id="kpi-total-money" class="text-2xl font-bold text-emerald-700 mt-1.5 tabular-nums">KES 0</p>
+          <p class="text-xs text-slate-500 mt-1">From today's sales</p>
         </div>
-        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
       </div>
 
-      <!-- Unpaid Bales / Credit Card (New) -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
+      <!-- 4. Number of Unpaid Bales -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales (Credit)</p>
-          <p id="kpi-unpaid-bales" class="text-2xl sm:text-3xl font-bold text-rose-700 mt-1.5 tabular-nums">0 bales</p>
-          <p id="kpi-unpaid-value" class="text-xs text-slate-600 font-medium mt-1">Value: KES 0</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales</p>
+          <p id="kpi-unpaid-bales" class="text-2xl font-bold text-rose-700 mt-1.5 tabular-nums">0 bales</p>
+          <p class="text-xs text-slate-500 font-medium mt-1">Taken on credit</p>
         </div>
-        <div class="p-3 bg-rose-100 text-rose-700 rounded-xl">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="p-2.5 bg-rose-100 text-rose-700 rounded-xl shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- 5. Cost of Unpaid Bales -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-rose-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales Cost</p>
+          <p id="kpi-unpaid-cost" class="text-2xl font-bold text-rose-700 mt-1.5 tabular-nums">KES 0</p>
+          <p class="text-xs text-rose-600/80 font-medium mt-1">Pending credit balance</p>
+        </div>
+        <div class="p-2.5 bg-rose-100 text-rose-700 rounded-xl shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
           </svg>
         </div>
       </div>
 
     </section>
 
-    <!-- Forms Container (Side by Side or Stacked) -->
+    <!-- Forms Container -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Form 1: Record Paid Sale -->
       <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div class="bg-emerald-950 text-white px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 class="text-base font-semibold">Record Paid Sale</h2>
+            <h2 class="text-base font-semibold">Record Paid Bales</h2>
             <p class="text-xs text-emerald-300">Enter bales sold & money collected</p>
           </div>
-
         </div>
 
         <form id="sale-form" class="p-6 space-y-4">
-          <!-- Product Type -->
-          <div>
-            <label for="product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Product / Grade</label>
-            <select
-              id="product-type"
-              name="productType"
-              class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
-            >
-              <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Maize (12 × 2kg) — Ref: 1,600</option>
-              <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Maize (24 × 1kg) — Ref: 1,600</option>
-            </select>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Product Type -->
+            <div>
+              <label for="product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Bale Size</label>
+              <select
+                id="product-type"
+                name="productType"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+              >
+                <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Bale (12 × 2kg)</option>
+                <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Bale (24 × 1kg)</option>
+              </select>
+            </div>
+
+            <!-- Date Bought -->
+            <div>
+              <label for="sale-date-bought" class="block text-sm font-medium text-slate-700 mb-1">
+                Date Bought <span class="text-rose-600">*</span>
+              </label>
+              <input
+                type="date"
+                id="sale-date-bought"
+                name="date_bought"
+                required
+                class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+              />
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -213,17 +258,33 @@
         </div>
 
         <form id="credit-form" class="p-6 space-y-4">
-          <!-- Product Type -->
-          <div>
-            <label for="credit-product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Product / Grade</label>
-            <select
-              id="credit-product-type"
-              name="creditProductType"
-              class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20"
-            >
-              <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Maize (12 × 2kg) — Ref: 1,600</option>
-              <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Maize (24 × 1kg) — Ref: 1,600</option>
-            </select>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Product Type -->
+            <div>
+              <label for="credit-product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Bales Size</label>
+              <select
+                id="credit-product-type"
+                name="creditProductType"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20"
+              >
+                <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Bale (12 × 2kg)</option>
+                <option value="Unga Maize (24 x 1kg)" data-rate="1600">Unga Bale (24 × 1kg)</option>
+              </select>
+            </div>
+
+            <!-- Date Bought -->
+            <div>
+              <label for="credit-date-bought" class="block text-sm font-medium text-slate-700 mb-1">
+                Date Bought <span class="text-rose-600">*</span>
+              </label>
+              <input
+                type="date"
+                id="credit-date-bought"
+                name="date_bought"
+                required
+                class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20"
+              />
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -336,34 +397,37 @@
       const STORAGE_KEY_CREDIT = 'unga_miller_credit_v1';
 
       // State
-      let sales = loadStorage(STORAGE_KEY_SALES);
-      let creditSales = loadStorage(STORAGE_KEY_CREDIT);
+      let sales = loadStorage(STORAGE_KEY_SALES, []);
+      let creditSales = loadStorage(STORAGE_KEY_CREDIT, []);
+      let dbBalesStock = 0; // Stores the fetched database stock
 
       let manualAmountEdited = false;
       let creditManualAmountEdited = false;
 
       // DOM Elements
       const dateDisplay = document.getElementById('current-date-display');
+      const kpiStoreBales = document.getElementById('kpi-store-bales');
+      const kpiStoreSubtext = document.getElementById('kpi-store-subtext');
       const kpiTotalBales = document.getElementById('kpi-total-bales');
       const kpiTotalMoney = document.getElementById('kpi-total-money');
       const kpiUnpaidBales = document.getElementById('kpi-unpaid-bales');
-      const kpiUnpaidValue = document.getElementById('kpi-unpaid-value');
+      const kpiUnpaidCost = document.getElementById('kpi-unpaid-cost');
 
       // Form 1 Elements
       const saleForm = document.getElementById('sale-form');
       const productSelect = document.getElementById('product-type');
+      const saleDateBoughtInput = document.getElementById('sale-date-bought');
       const balesInput = document.getElementById('bales-sold');
       const amountInput = document.getElementById('amount-collected');
-      const customerInput = document.getElementById('customer-name');
       const rateHint = document.getElementById('rate-hint');
       const formError = document.getElementById('form-error');
 
       // Form 2 Elements (Credit)
       const creditForm = document.getElementById('credit-form');
       const creditProductSelect = document.getElementById('credit-product-type');
+      const creditDateBoughtInput = document.getElementById('credit-date-bought');
       const creditBalesInput = document.getElementById('credit-bales-sold');
       const creditAmountInput = document.getElementById('credit-amount-collected');
-      const creditCustomerInput = document.getElementById('credit-customer-name');
       const creditRateHint = document.getElementById('credit-rate-hint');
       const creditFormError = document.getElementById('credit-form-error');
 
@@ -389,7 +453,12 @@
         day: 'numeric'
       });
 
-      function loadStorage(key) {
+      // Default both "Date Bought" inputs to today's YYYY-MM-DD (local time)
+      const todayISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      saleDateBoughtInput.value = todayISO;
+      creditDateBoughtInput.value = todayISO;
+
+      function loadStorage(key, fallback) {
         try {
           const saved = localStorage.getItem(key);
           if (saved !== null) {
@@ -398,7 +467,7 @@
         } catch (e) {
           console.error('Failed to read localStorage:', e);
         }
-        return [];
+        return fallback;
       }
 
       function saveStorage(key, data) {
@@ -418,6 +487,22 @@
           toast.classList.add('hidden');
           toast.classList.remove('flex');
         }, 3000);
+      }
+
+      // ** FETCH BALES STOCK FROM DJANGO API (Matched to /api/stock/) **
+      async function fetchBalesStock() {
+        try {
+          const response = await fetch('/inventory/api/stock/');
+          if (!response.ok) {
+            throw new Error('Failed to fetch stock from database');
+          }
+          const data = await response.json();
+          dbBalesStock = data.bales_stock || 0;
+          renderDashboard();
+        } catch (error) {
+          console.error('Error fetching bales stock:', error);
+          kpiStoreBales.textContent = 'Error';
+        }
       }
 
       // Auto-calculate Form 1 amount
@@ -488,13 +573,20 @@
         const totalMoney = sales.reduce((sum, item) => sum + Number(item.amount), 0);
         
         const unpaidBalesCount = creditSales.reduce((sum, item) => sum + Number(item.bales), 0);
-        const unpaidTotalValue = creditSales.reduce((sum, item) => sum + Number(item.amount), 0);
+        const unpaidTotalCost = creditSales.reduce((sum, item) => sum + Number(item.amount), 0);
 
-        kpiTotalBales.textContent = formatNumber(totalBales);
+        // Calculate remaining store stock based on Database Stock minus today's dispatched (sold + credit)
+        const totalDispatched = totalBales + unpaidBalesCount;
+        const remainingInStore = Math.max(0, Number(dbBalesStock) - totalDispatched);
+
+        kpiStoreBales.textContent = `${formatNumber(remainingInStore)} bales`;
+        kpiStoreSubtext.textContent = `Database total: ${formatNumber(dbBalesStock)}`;
+
+        kpiTotalBales.textContent = `${formatNumber(totalBales)} bales`;
         kpiTotalMoney.textContent = formatKES(totalMoney);
         
         kpiUnpaidBales.textContent = `${formatNumber(unpaidBalesCount)} bales`;
-        kpiUnpaidValue.textContent = `Value: ${formatKES(unpaidTotalValue)}`;
+        kpiUnpaidCost.textContent = formatKES(unpaidTotalCost);
       }
 
       // Form 1 Submission (Paid Sale)
@@ -505,8 +597,15 @@
         const bales = parseInt(balesInput.value, 10);
         const amount = parseFloat(amountInput.value);
         const product = productSelect.value;
-        const customer = customerInput.value.trim() || 'Walk-in Customer';
+        const date_bought = saleDateBoughtInput.value;
         const payment = saleForm.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (!date_bought) {
+          formError.textContent = 'Please select the date bought.';
+          formError.classList.remove('hidden');
+          saleDateBoughtInput.focus();
+          return;
+        }
 
         if (isNaN(bales) || bales <= 0) {
           formError.textContent = 'Please enter a valid number of bales.';
@@ -525,7 +624,7 @@
         const newSale = {
           id: 'tx-' + Date.now(),
           time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
-          customer,
+          date_bought,
           product,
           bales,
           amount,
@@ -538,7 +637,7 @@
 
         balesInput.value = '';
         amountInput.value = '';
-        customerInput.value = '';
+        saleDateBoughtInput.value = todayISO;
         manualAmountEdited = false;
         updateSuggestedAmount();
         balesInput.focus();
@@ -554,7 +653,14 @@
         const bales = parseInt(creditBalesInput.value, 10);
         const amount = parseFloat(creditAmountInput.value);
         const product = creditProductSelect.value;
-        const customer = creditCustomerInput.value.trim();
+        const date_bought = creditDateBoughtInput.value;
+
+        if (!date_bought) {
+          creditFormError.textContent = 'Please select the date bought.';
+          creditFormError.classList.remove('hidden');
+          creditDateBoughtInput.focus();
+          return;
+        }
 
         if (isNaN(bales) || bales <= 0) {
           creditFormError.textContent = 'Please enter a valid number of bales taken.';
@@ -570,17 +676,10 @@
           return;
         }
 
-        if (!customer) {
-          creditFormError.textContent = 'Please provide a customer or shop name for credit tracking.';
-          creditFormError.classList.remove('hidden');
-          creditCustomerInput.focus();
-          return;
-        }
-
         const newCreditSale = {
           id: 'credit-' + Date.now(),
           time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
-          customer,
+          date_bought,
           product,
           bales,
           amount,
@@ -593,12 +692,12 @@
 
         creditBalesInput.value = '';
         creditAmountInput.value = '';
-        creditCustomerInput.value = '';
+        creditDateBoughtInput.value = todayISO;
         creditManualAmountEdited = false;
         updateCreditSuggestedAmount();
         creditBalesInput.focus();
 
-        showToast(`Recorded ${bales} unpaid bales for ${customer}`);
+        showToast(`Recorded ${bales} unpaid bales (${formatKES(amount)})`);
       });
 
       // Reset Modal Controls
@@ -623,10 +722,10 @@
         showToast('All daily sales & credit cleared');
       });
 
-      // Initial render
+      // Initial execution
       updateSuggestedAmount();
       updateCreditSuggestedAmount();
-      renderDashboard();
+      fetchBalesStock(); // Calls the backend API on load
     })();
   </script>
 </body>
