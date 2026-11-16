@@ -37,12 +37,9 @@
       </div>
 
       <div class="flex items-center gap-2.5">
-         <button
-          type="button"
-          onclick="window.location.href='{% url 'Home:index' %}'"
-          class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
-          HOME
-        </button>
+         <a href="{% url 'Home:index' %}"
+         class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
+        Home</a>
         <button
           id="btn-open-reset-modal"
           type="button"
