@@ -6,3 +6,11 @@ from .serializers import PaidBalesRecordsSerializer, RecordsOfUnpaidBalesSeriali
 # Create your views here.
 def sale_home(request):
     return render(request, 'sales/sales.html')
+
+class PaidBalesRecordsAPIView(generics.ListCreateAPIView):
+    queryset= PaidBalesRecords.object.all()
+    serializer_class = PaidBalesRecordsSerializer
+
+class RecordsOfUnpaidBalesAPIView(generics.ListCreateAPIView):
+    queryset = RecordsOfUnpaidBales.objects.all()
+    serializer_class = PaidBalesRecordsSerializer
