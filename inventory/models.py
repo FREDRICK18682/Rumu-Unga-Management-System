@@ -22,4 +22,4 @@ class CompanyMachinery(models.Model):
                               choices=STATUS_CHOICES,
                               default="Operational")
     def __str__(self):
-        return f"{self.machinery_name} - {self.status}"
+        return f"{self.machinery_name} - {self.status}" 
