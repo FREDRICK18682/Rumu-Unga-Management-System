@@ -36,7 +36,17 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5">
+      <!-- Date Filter & Actions -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2 bg-emerald-950/80 px-3 py-1.5 rounded-lg border border-emerald-700">
+          <label for="dashboard-date-filter" class="text-xs font-medium text-emerald-200">Filter Date:</label>
+          <input
+            type="date"
+            id="dashboard-date-filter"
+            class="bg-emerald-900 text-white text-xs font-semibold px-2 py-1 rounded border border-emerald-600 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          />
+        </div>
+
         <a
           href="{% url 'Home:index' %}"
           class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
@@ -50,7 +60,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          Reset Day
+          Reset View
         </button>
       </div>
     </div>
@@ -76,12 +86,12 @@
         </div>
       </div>
 
-      <!-- 2. Total Bales Sold Today -->
+      <!-- 2. Total Bales Sold (Selected Date) -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Bales Sold Today</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Bales Sold (Date)</p>
           <p id="kpi-total-bales" class="text-2xl font-bold text-slate-900 mt-1.5 tabular-nums">0 bales</p>
-          <p class="text-xs text-emerald-700 font-medium mt-1">Dispatched & paid</p>
+          <p class="text-xs text-emerald-700 font-medium mt-1">For selected date</p>
         </div>
         <div class="p-2.5 bg-amber-100 text-amber-700 rounded-xl shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -90,12 +100,12 @@
         </div>
       </div>
 
-      <!-- 3. Money Collected from Today's Sales -->
+      <!-- 3. Money Collected (Selected Date) -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
         <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Money Collected</p>
           <p id="kpi-total-money" class="text-2xl font-bold text-emerald-700 mt-1.5 tabular-nums">KES 0</p>
-          <p class="text-xs text-slate-500 mt-1">From today's sales</p>
+          <p class="text-xs text-slate-500 mt-1">For selected date</p>
         </div>
         <div class="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -104,12 +114,12 @@
         </div>
       </div>
 
-      <!-- 4. Number of Unpaid Bales -->
+      <!-- 4. Number of Unpaid Bales (Selected Date) -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-start justify-between">
         <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales</p>
           <p id="kpi-unpaid-bales" class="text-2xl font-bold text-rose-700 mt-1.5 tabular-nums">0 bales</p>
-          <p class="text-xs text-slate-500 font-medium mt-1">Taken on credit</p>
+          <p class="text-xs text-slate-500 font-medium mt-1">For selected date</p>
         </div>
         <div class="p-2.5 bg-rose-100 text-rose-700 rounded-xl shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -118,7 +128,7 @@
         </div>
       </div>
 
-      <!-- 5. Cost of Unpaid Bales -->
+      <!-- 5. Cost of Unpaid Bales (Selected Date) -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-rose-200/80 shadow-sm flex items-start justify-between">
         <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-rose-600">Unpaid Bales Cost</p>
@@ -153,7 +163,7 @@
               <label for="product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Bale Size</label>
               <select
                 id="product-type"
-                name="productType"
+                name="unga_bale_size"
                 class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
               >
                 <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Bale (12 × 2kg)</option>
@@ -185,7 +195,7 @@
               <input
                 type="number"
                 id="bales-sold"
-                name="balesSold"
+                name="number_of_bales"
                 min="1"
                 step="1"
                 required
@@ -207,7 +217,7 @@
                 <input
                   type="number"
                   id="amount-collected"
-                  name="amountCollected"
+                  name="money_collected"
                   min="1"
                   step="any"
                   required
@@ -264,7 +274,7 @@
               <label for="credit-product-type" class="block text-sm font-medium text-slate-700 mb-1">Unga Bales Size</label>
               <select
                 id="credit-product-type"
-                name="creditProductType"
+                name="unga_bale_size"
                 class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20"
               >
                 <option value="Unga Maize (12 x 2kg)" data-rate="1600">Unga Bale (12 × 2kg)</option>
@@ -296,7 +306,7 @@
               <input
                 type="number"
                 id="credit-bales-sold"
-                name="creditBalesSold"
+                name="number_of_bales"
                 min="1"
                 step="1"
                 required
@@ -318,7 +328,7 @@
                 <input
                   type="number"
                   id="credit-amount-collected"
-                  name="creditAmountCollected"
+                  name="total_value"
                   min="1"
                   step="any"
                   required
@@ -361,10 +371,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
-        <h3 class="text-lg font-bold text-slate-900">Reset Daily Sales & Credit?</h3>
+        <h3 class="text-lg font-bold text-slate-900">Reset View?</h3>
       </div>
       <p class="text-sm text-slate-600 leading-relaxed">
-        This will permanently clear all recorded paid sales and unpaid credit balances for today.
+        This will reset the filter date to today. Database records remain securely stored.
       </p>
       <div class="mt-6 flex items-center justify-end gap-3">
         <button
@@ -379,7 +389,7 @@
           type="button"
           class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-sm font-semibold text-white transition cursor-pointer"
         >
-          Yes, Clear All
+          Yes, Reset to Today
         </button>
       </div>
     </div>
@@ -391,21 +401,32 @@
     <span id="toast-message">Sale recorded!</span>
   </div>
 
+  <!-- JavaScript Integration with Django Backend APIs -->
   <script>
     (() => {
-      const STORAGE_KEY_SALES = 'unga_miller_sales_v1';
-      const STORAGE_KEY_CREDIT = 'unga_miller_credit_v1';
-
-      // State
-      let sales = loadStorage(STORAGE_KEY_SALES, []);
-      let creditSales = loadStorage(STORAGE_KEY_CREDIT, []);
-      let dbBalesStock = 0; // Stores the fetched database stock
+      // Helper function to extract Django CSRF token for secure POST requests
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getCookie('csrftoken');
 
       let manualAmountEdited = false;
       let creditManualAmountEdited = false;
 
       // DOM Elements
       const dateDisplay = document.getElementById('current-date-display');
+      const dateFilterInput = document.getElementById('dashboard-date-filter');
       const kpiStoreBales = document.getElementById('kpi-store-bales');
       const kpiStoreSubtext = document.getElementById('kpi-store-subtext');
       const kpiTotalBales = document.getElementById('kpi-total-bales');
@@ -413,7 +434,7 @@
       const kpiUnpaidBales = document.getElementById('kpi-unpaid-bales');
       const kpiUnpaidCost = document.getElementById('kpi-unpaid-cost');
 
-      // Form 1 Elements
+      // Form 1 Elements (Paid Sales)
       const saleForm = document.getElementById('sale-form');
       const productSelect = document.getElementById('product-type');
       const saleDateBoughtInput = document.getElementById('sale-date-bought');
@@ -422,7 +443,7 @@
       const rateHint = document.getElementById('rate-hint');
       const formError = document.getElementById('form-error');
 
-      // Form 2 Elements (Credit)
+      // Form 2 Elements (Credit / Unpaid Sales)
       const creditForm = document.getElementById('credit-form');
       const creditProductSelect = document.getElementById('credit-product-type');
       const creditDateBoughtInput = document.getElementById('credit-date-bought');
@@ -444,8 +465,10 @@
       const formatNumber = (num) => new Intl.NumberFormat('en-KE').format(Math.round(num));
       const formatKES = (num) => `KES ${new Intl.NumberFormat('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(num)}`;
 
-      // Set current date
+      // Set current date & default filter date to today (local time)
       const now = new Date();
+      const todayISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      
       dateDisplay.textContent = now.toLocaleDateString('en-KE', {
         weekday: 'long',
         year: 'numeric',
@@ -453,30 +476,9 @@
         day: 'numeric'
       });
 
-      // Default both "Date Bought" inputs to today's YYYY-MM-DD (local time)
-      const todayISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      dateFilterInput.value = todayISO;
       saleDateBoughtInput.value = todayISO;
       creditDateBoughtInput.value = todayISO;
-
-      function loadStorage(key, fallback) {
-        try {
-          const saved = localStorage.getItem(key);
-          if (saved !== null) {
-            return JSON.parse(saved);
-          }
-        } catch (e) {
-          console.error('Failed to read localStorage:', e);
-        }
-        return fallback;
-      }
-
-      function saveStorage(key, data) {
-        try {
-          localStorage.setItem(key, JSON.stringify(data));
-        } catch (e) {
-          console.error('Failed to save to localStorage:', e);
-        }
-      }
 
       function showToast(msg) {
         toastMessage.textContent = msg;
@@ -489,20 +491,44 @@
         }, 3000);
       }
 
-      // ** FETCH BALES STOCK FROM DJANGO API (Matched to /api/stock/) **
+      // ** FETCH SUMMARY DATA FROM DJANGO SUMMARY API **
+      async function fetchDailySummary(dateVal) {
+        try {
+          const response = await fetch(`/sales/api/daily-summary/?date=${dateVal}`);
+          if (!response.ok) throw new Error('Failed to fetch summary data');
+          const data = await response.json();
+
+          // Populate Paid Sales KPIs
+          kpiTotalBales.textContent = `${formatNumber(data.paid_sales.bales_sold)} bales`;
+          kpiTotalMoney.textContent = formatKES(data.paid_sales.money_collected);
+
+          // Populate Unpaid Sales KPIs
+          kpiUnpaidBales.textContent = `${formatNumber(data.unpaid_sales.bales_unpaid)} bales`;
+          kpiUnpaidCost.textContent = formatKES(data.unpaid_sales.total_value);
+        } catch (error) {
+          console.error('Error fetching summary:', error);
+        }
+      }
+
+      // ** FETCH BALES STOCK FROM INVENTORY API **
       async function fetchBalesStock() {
         try {
           const response = await fetch('/inventory/api/stock/');
-          if (!response.ok) {
-            throw new Error('Failed to fetch stock from database');
-          }
+          if (!response.ok) throw new Error('Failed to fetch stock from database');
           const data = await response.json();
-          dbBalesStock = data.bales_stock || 0;
-          renderDashboard();
+          const dbBalesStock = data.bales_stock || 0;
+          kpiStoreBales.textContent = `${formatNumber(dbBalesStock)} bales`;
+          kpiStoreSubtext.textContent = `Database inventory`;
         } catch (error) {
           console.error('Error fetching bales stock:', error);
-          kpiStoreBales.textContent = 'Error';
+          kpiStoreBales.textContent = 'Unavailable';
         }
+      }
+
+      // Main refresh trigger when date changes
+      function refreshDashboard() {
+        const selectedDate = dateFilterInput.value;
+        fetchDailySummary(selectedDate);
       }
 
       // Auto-calculate Form 1 amount
@@ -567,137 +593,104 @@
         creditRateHint.textContent = creditManualAmountEdited ? 'Custom amount' : '@ rate';
       });
 
-      // Render KPIs
-      function renderDashboard() {
-        const totalBales = sales.reduce((sum, item) => sum + Number(item.bales), 0);
-        const totalMoney = sales.reduce((sum, item) => sum + Number(item.amount), 0);
-        
-        const unpaidBalesCount = creditSales.reduce((sum, item) => sum + Number(item.bales), 0);
-        const unpaidTotalCost = creditSales.reduce((sum, item) => sum + Number(item.amount), 0);
+      // Date Filter Change Listener
+      dateFilterInput.addEventListener('change', () => {
+        refreshDashboard();
+      });
 
-        // Calculate remaining store stock based on Database Stock minus today's dispatched (sold + credit)
-        const totalDispatched = totalBales + unpaidBalesCount;
-        const remainingInStore = Math.max(0, Number(dbBalesStock) - totalDispatched);
-
-        kpiStoreBales.textContent = `${formatNumber(remainingInStore)} bales`;
-        kpiStoreSubtext.textContent = `Database total: ${formatNumber(dbBalesStock)}`;
-
-        kpiTotalBales.textContent = `${formatNumber(totalBales)} bales`;
-        kpiTotalMoney.textContent = formatKES(totalMoney);
-        
-        kpiUnpaidBales.textContent = `${formatNumber(unpaidBalesCount)} bales`;
-        kpiUnpaidCost.textContent = formatKES(unpaidTotalCost);
-      }
-
-      // Form 1 Submission (Paid Sale)
-      saleForm.addEventListener('submit', (e) => {
+      // ** FORM 1 SUBMISSION (POST PAID SALE TO DJANGO API) **
+      saleForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         formError.classList.add('hidden');
 
-        const bales = parseInt(balesInput.value, 10);
-        const amount = parseFloat(amountInput.value);
-        const product = productSelect.value;
-        const date_bought = saleDateBoughtInput.value;
-        const payment = saleForm.querySelector('input[name="paymentMethod"]:checked').value;
-
-        if (!date_bought) {
-          formError.textContent = 'Please select the date bought.';
-          formError.classList.remove('hidden');
-          saleDateBoughtInput.focus();
-          return;
-        }
-
-        if (isNaN(bales) || bales <= 0) {
-          formError.textContent = 'Please enter a valid number of bales.';
-          formError.classList.remove('hidden');
-          balesInput.focus();
-          return;
-        }
-
-        if (isNaN(amount) || amount <= 0) {
-          formError.textContent = 'Please enter a valid amount collected.';
-          formError.classList.remove('hidden');
-          amountInput.focus();
-          return;
-        }
-
-        const newSale = {
-          id: 'tx-' + Date.now(),
-          time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
-          date_bought,
-          product,
-          bales,
-          amount,
-          payment
+        const payload = {
+          unga_bale_size: productSelect.value,
+          number_of_bales: parseInt(balesInput.value, 10),
+          money_collected: parseFloat(amountInput.value),
+          payment_method: saleForm.querySelector('input[name="paymentMethod"]:checked').value,
+          date_bought: saleDateBoughtInput.value
         };
 
-        sales.unshift(newSale);
-        saveStorage(STORAGE_KEY_SALES, sales);
-        renderDashboard();
+        try {
+          const response = await fetch('/sales/api/paid-bales/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(payload)
+          });
 
-        balesInput.value = '';
-        amountInput.value = '';
-        saleDateBoughtInput.value = todayISO;
-        manualAmountEdited = false;
-        updateSuggestedAmount();
-        balesInput.focus();
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(JSON.stringify(errData) || 'Failed to save paid sale.');
+          }
 
-        showToast(`Recorded ${bales} paid bales (${formatKES(amount)})`);
+          const data = await response.json();
+
+          // Automatically sync filter date to the newly recorded entry date and refresh
+          dateFilterInput.value = data.date_bought;
+          refreshDashboard();
+          fetchBalesStock();
+          showToast(`Recorded ${data.number_of_bales} paid bales successfully!`);
+
+          saleForm.reset();
+          saleDateBoughtInput.value = todayISO;
+          manualAmountEdited = false;
+          updateSuggestedAmount();
+          balesInput.focus();
+        } catch (err) {
+          console.error(err);
+          formError.textContent = 'Error saving record to database. Check your inputs.';
+          formError.classList.remove('hidden');
+        }
       });
 
-      // Form 2 Submission (Credit / Unpaid Bales)
-      creditForm.addEventListener('submit', (e) => {
+      // ** FORM 2 SUBMISSION (POST UNPAID CREDIT SALE TO DJANGO API) **
+      creditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         creditFormError.classList.add('hidden');
 
-        const bales = parseInt(creditBalesInput.value, 10);
-        const amount = parseFloat(creditAmountInput.value);
-        const product = creditProductSelect.value;
-        const date_bought = creditDateBoughtInput.value;
-
-        if (!date_bought) {
-          creditFormError.textContent = 'Please select the date bought.';
-          creditFormError.classList.remove('hidden');
-          creditDateBoughtInput.focus();
-          return;
-        }
-
-        if (isNaN(bales) || bales <= 0) {
-          creditFormError.textContent = 'Please enter a valid number of bales taken.';
-          creditFormError.classList.remove('hidden');
-          creditBalesInput.focus();
-          return;
-        }
-
-        if (isNaN(amount) || amount <= 0) {
-          creditFormError.textContent = 'Please enter a valid total value.';
-          creditFormError.classList.remove('hidden');
-          creditAmountInput.focus();
-          return;
-        }
-
-        const newCreditSale = {
-          id: 'credit-' + Date.now(),
-          time: new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' }),
-          date_bought,
-          product,
-          bales,
-          amount,
-          status: 'Unpaid'
+        const payload = {
+          unga_bale_size: creditProductSelect.value,
+          number_of_bales: parseInt(creditBalesInput.value, 10),
+          total_value: parseFloat(creditAmountInput.value),
+          date_bought: creditDateBoughtInput.value
         };
 
-        creditSales.unshift(newCreditSale);
-        saveStorage(STORAGE_KEY_CREDIT, creditSales);
-        renderDashboard();
+        try {
+          const response = await fetch('/sales/api/unpaid-bales/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(payload)
+          });
 
-        creditBalesInput.value = '';
-        creditAmountInput.value = '';
-        creditDateBoughtInput.value = todayISO;
-        creditManualAmountEdited = false;
-        updateCreditSuggestedAmount();
-        creditBalesInput.focus();
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(JSON.stringify(errData) || 'Failed to save credit sale.');
+          }
 
-        showToast(`Recorded ${bales} unpaid bales (${formatKES(amount)})`);
+          const data = await response.json();
+
+          // Automatically sync filter date to the newly recorded entry date and refresh
+          dateFilterInput.value = data.date_bought;
+          refreshDashboard();
+          fetchBalesStock();
+          showToast(`Recorded ${data.number_of_bales} unpaid credit bales!`);
+
+          creditForm.reset();
+          creditDateBoughtInput.value = todayISO;
+          creditManualAmountEdited = false;
+          updateCreditSuggestedAmount();
+          creditBalesInput.focus();
+        } catch (err) {
+          console.error(err);
+          creditFormError.textContent = 'Error saving credit record to database. Check your inputs.';
+          creditFormError.classList.remove('hidden');
+        }
       });
 
       // Reset Modal Controls
@@ -712,20 +705,18 @@
       });
 
       btnConfirmReset.addEventListener('click', () => {
-        sales = [];
-        creditSales = [];
-        saveStorage(STORAGE_KEY_SALES, sales);
-        saveStorage(STORAGE_KEY_CREDIT, creditSales);
-        renderDashboard();
+        dateFilterInput.value = todayISO;
+        refreshDashboard();
         resetModal.classList.add('hidden');
         resetModal.classList.remove('flex');
-        showToast('All daily sales & credit cleared');
+        showToast('Dashboard reset to today.');
       });
 
-      // Initial execution
+      // Initial page load executions
       updateSuggestedAmount();
       updateCreditSuggestedAmount();
-      fetchBalesStock(); // Calls the backend API on load
+      refreshDashboard();
+      fetchBalesStock();
     })();
   </script>
 </body>

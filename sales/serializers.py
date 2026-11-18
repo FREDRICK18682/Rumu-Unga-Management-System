@@ -11,3 +11,8 @@ class RecordsOfUnpaidBalesSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecordsOfUnpaidBales
         fields="__all__"
+#serilaizer for the APi to display the record for a given date
+class DailySalesSummerySerializer(serializers.Serializer):
+    data = serializers.DateField()
+    paid_sales = PaidBalesRecordsSerializer()
+    unpaid_sales = RecordsOfUnpaidBalesSerializer()

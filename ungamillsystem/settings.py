@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'sales',
     'rest_framework',
     'Home',
+    'credits',
+    'human_resource',
 ]
 
 MIDDLEWARE = [
