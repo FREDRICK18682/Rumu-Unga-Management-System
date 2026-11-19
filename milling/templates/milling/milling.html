@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ngano Flour Mill - Milling Records & Financial Report</title>
+  <title>Ngano Flour Mill - Milling Records &amp; Financial Report</title>
   <style>
     :root {
       --bg-page: #f8fafc;
@@ -536,6 +536,7 @@
         <button type="button" class="btn btn-cancel" onclick="closeForms()">Close</button>
       </div>
       <form id="customer-milling-form" onsubmit="saveCustomerRecord(event)">
+        {% csrf_token %}
         <div class="form-grid">
           <div class="form-group">
             <label for="cust-kg">Kgs Milled</label>
@@ -571,6 +572,7 @@
         <button type="button" class="btn btn-cancel" onclick="closeForms()">Close</button>
       </div>
       <form id="school-milling-form" onsubmit="saveSchoolRecord(event)">
+        {% csrf_token %}
         <div class="form-grid">
           <div class="form-group">
             <label for="school-name">Name of School</label>
@@ -681,7 +683,7 @@
   </footer>
 
   <script>
-    const customerRecords = [
+    let customerRecords = [
       { kg: 50, grade: "Grade 1", cost: 15, date: "2023-10-26" },
       { kg: 100, grade: "Grade 2", cost: 25, date: "2023-10-26" },
       { kg: 30, grade: "Grade 1", cost: 9, date: "2023-10-26" },
@@ -689,10 +691,39 @@
       { kg: 90, grade: "Grade 2", cost: 22, date: "2023-10-26" }
     ];
 
-    const schoolRecords = [
+    let schoolRecords = [
       { school: "St. Kizito School", bags: 20, value: 1000, date: "2023-10-26" },
       { school: "Valley View Academy", bags: 10, value: 500, date: "2023-10-26" }
     ];
+
+    const API_URLS = {
+      localMilling: "{% url 'milling:api-local-milling' %}",
+      schoolMillRecords: "{% url 'milling:api-school-millrecords' %}",
+    };
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    function showStatusMessage(elementId, message, isError = false) {
+      const msgBox = document.getElementById(elementId);
+      msgBox.textContent = message;
+      msgBox.style.background = isError ? "#fef2f2" : "";
+      msgBox.style.color = isError ? "#991b1b" : "";
+      msgBox.style.borderColor = isError ? "#fecaca" : "";
+      msgBox.classList.add("show");
+    }
 
     function toggleForm(panelId) {
       const target = document.getElementById(panelId);
@@ -716,44 +747,130 @@
       document.getElementById("school-form-panel").classList.remove("active");
     }
 
-    function saveCustomerRecord(event) {
+    async function saveCustomerRecord(event) {
       event.preventDefault();
 
-      const kg = parseFloat(document.getElementById("cust-kg").value);
+      const kg = document.getElementById("cust-kg").value.trim();
       const grade = document.getElementById("cust-grade").value;
-      const cost = parseFloat(document.getElementById("cust-cost").value);
+      const cost = document.getElementById("cust-cost").value;
       const date = document.getElementById("cust-date").value;
 
-      customerRecords.unshift({ kg, grade, cost, date });
-      document.getElementById("query-date").value = date;
-      renderDashboard();
+      const payload = {
+        kgs: kg,
+        unga_grade: grade,
+        total_cost: cost,
+        date_milled: date,
+      };
 
-      document.getElementById("customer-milling-form").reset();
-      document.getElementById("cust-date").value = date;
+      try {
+        const response = await fetch(API_URLS.localMilling, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(payload),
+        });
 
-      const msgBox = document.getElementById("customer-success-msg");
-      msgBox.textContent = `✓ Saved successfully: ${kg} kg (${grade}) - ${cost.toLocaleString()} milled on ${date}.`;
-      msgBox.classList.add("show");
+        const data = await response.json();
+
+        if (!response.ok) {
+          showStatusMessage(
+            "customer-success-msg",
+            `✕ Could not save: ${JSON.stringify(data)}`,
+            true
+          );
+          return;
+        }
+
+        customerRecords.unshift({
+          kg: data.kgs ?? kg,
+          grade: data.unga_grade ?? grade,
+          cost: data.total_cost ?? cost,
+          date: data.date_milled ?? date,
+        });
+
+        document.getElementById("query-date").value = date;
+        renderDashboard();
+
+        document.getElementById("customer-milling-form").reset();
+        document.getElementById("cust-date").value = date;
+
+        showStatusMessage(
+          "customer-success-msg",
+          `✓ Saved to database: ${kg} kg (${grade}) - KSH ${Number(cost).toLocaleString()} milled on ${date}.`
+        );
+      } catch (error) {
+        console.error("Network error saving customer record:", error);
+        showStatusMessage(
+          "customer-success-msg",
+          "✕ Network error while saving customer record.",
+          true
+        );
+      }
     }
 
-    function saveSchoolRecord(event) {
+    async function saveSchoolRecord(event) {
       event.preventDefault();
 
       const school = document.getElementById("school-name").value.trim();
       const bags = parseInt(document.getElementById("school-bags").value, 10);
-      const value = parseFloat(document.getElementById("school-value").value);
+      const value = document.getElementById("school-value").value;
       const date = document.getElementById("school-date").value;
 
-      schoolRecords.unshift({ school, bags, value, date });
-      document.getElementById("query-date").value = date;
-      renderDashboard();
+      const payload = {
+        name_of_school: school,
+        number_of_bags: bags,
+        total_value: value,
+        date_milled: date,
+      };
 
-      document.getElementById("school-milling-form").reset();
-      document.getElementById("school-date").value = date;
+      try {
+        const response = await fetch(API_URLS.schoolMillRecords, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(payload),
+        });
 
-      const msgBox = document.getElementById("school-success-msg");
-      msgBox.textContent = `✓ Saved successfully: ${school} (${bags} bags, ${value.toLocaleString()}) milled on ${date}.`;
-      msgBox.classList.add("show");
+        const data = await response.json();
+
+        if (!response.ok) {
+          showStatusMessage(
+            "school-success-msg",
+            `✕ Could not save: ${JSON.stringify(data)}`,
+            true
+          );
+          return;
+        }
+
+        schoolRecords.unshift({
+          school: data.name_of_school ?? school,
+          bags: data.number_of_bags ?? bags,
+          value: data.total_value ?? value,
+          date: data.date_milled ?? date,
+        });
+
+        document.getElementById("query-date").value = date;
+        renderDashboard();
+
+        document.getElementById("school-milling-form").reset();
+        document.getElementById("school-date").value = date;
+
+        showStatusMessage(
+          "school-success-msg",
+          `✓ Saved to database: ${school} (${bags} bags, KSH ${Number(value).toLocaleString()}) milled on ${date}.`
+        );
+      } catch (error) {
+        console.error("Network error saving school record:", error);
+        showStatusMessage(
+          "school-success-msg",
+          "✕ Network error while saving school record.",
+          true
+        );
+      }
     }
 
     function renderDashboard() {
@@ -767,10 +884,10 @@
         ? schoolRecords.filter((r) => r.date === selectedDate)
         : schoolRecords;
 
-      const totalKgs = filteredCustomers.reduce((sum, r) => sum + r.kg, 0);
-      const totalMoney = filteredCustomers.reduce((sum, r) => sum + r.cost, 0);
-      const totalBags = filteredSchools.reduce((sum, r) => sum + r.bags, 0);
-      const totalBagsValue = filteredSchools.reduce((sum, r) => sum + r.value, 0);
+      const totalKgs = filteredCustomers.reduce((sum, r) => sum + Number(r.kg || 0), 0);
+      const totalMoney = filteredCustomers.reduce((sum, r) => sum + Number(r.cost || 0), 0);
+      const totalBags = filteredSchools.reduce((sum, r) => sum + Number(r.bags || 0), 0);
+      const totalBagsValue = filteredSchools.reduce((sum, r) => sum + Number(r.value || 0), 0);
 
       document.getElementById("card-total-kgs").textContent = `${totalKgs.toLocaleString()} Kg`;
       document.getElementById("card-total-money").textContent = `KSH ${totalMoney.toLocaleString()}`;
@@ -787,7 +904,7 @@
             <tr>
               <td>${r.kg} kg</td>
               <td>${r.grade}</td>
-              <td>KSH ${r.cost.toLocaleString()}</td>
+              <td>KSH ${Number(r.cost).toLocaleString()}</td>
             </tr>
           `
           )
@@ -804,7 +921,7 @@
             <tr>
               <td>${idx + 1}. ${r.school}</td>
               <td>${r.bags} bags</td>
-              <td>KSH ${r.value.toLocaleString()}</td>
+              <td>KSH ${Number(r.value).toLocaleString()}</td>
             </tr>
           `
           )
@@ -826,6 +943,6 @@
     }
 
     renderDashboard();
-  </script>
+</script>
 </body>
 </html>
