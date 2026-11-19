@@ -263,6 +263,13 @@
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
+    .form-group input[readonly] {
+      background: #f1f5f9;
+      color: var(--text-dark);
+      font-weight: 600;
+      cursor: not-allowed;
+    }
+
     .form-group input:focus,
     .form-group select:focus {
       outline: none;
@@ -318,6 +325,7 @@
       gap: 10px;
       font-size: 0.88rem;
       font-weight: 500;
+      flex-wrap: wrap;
     }
 
     .date-query-box input[type="date"] {
@@ -341,6 +349,25 @@
     .btn-clear-date:hover {
       background: var(--row-alt);
       color: var(--primary);
+    }
+
+    .report-feedback {
+      width: 100%;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: #f1f5f9;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .report-feedback.show {
+      display: block;
+    }
+
+    .report-feedback.error {
+      background: #fef2f2;
+      color: #991b1b;
     }
 
     /* 4 Summary Cards Grid */
@@ -506,7 +533,7 @@
     <div class="header-right">
       <div class="meta-block">
         <span>Date</span>
-        <strong id="header-current-date">October 26, 2023</strong>
+        <strong id="header-current-date"></strong>
       </div>
       <div class="divider-v"></div>
       <div class="meta-block">
@@ -532,7 +559,7 @@
     <!-- Inline Form 1: New Customer Milling Entry -->
     <section id="customer-form-panel" class="form-panel">
       <div class="form-panel-header">
-        <h3>New Customer Milling Entry</h3>
+        <h3>New Customer Milling Entry (Grade 1: KSH 8/kg | Grade 2: KSH 10/kg)</h3>
         <button type="button" class="btn btn-cancel" onclick="closeForms()">Close</button>
       </div>
       <form id="customer-milling-form" onsubmit="saveCustomerRecord(event)">
@@ -540,18 +567,18 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="cust-kg">Kgs Milled</label>
-            <input type="number" id="cust-kg" min="1" step="any" placeholder="e.g. 50" required />
+            <input type="number" id="cust-kg" min="0.1" step="any" placeholder="e.g. 50" oninput="updateCustomerCost()" required />
           </div>
           <div class="form-group">
             <label for="cust-grade">Unga Grade</label>
-            <select id="cust-grade" required>
-              <option value="Grade 1">Grade 1</option>
-              <option value="Grade 2">Grade 2</option>
+            <select id="cust-grade" onchange="updateCustomerCost()" required>
+              <option value="Grade 1">Grade 1 (KSH 8/kg)</option>
+              <option value="Grade 2">Grade 2 (KSH 10/kg)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="cust-cost">Total Cost</label>
-            <input type="number" id="cust-cost" min="0" step="any" placeholder="e.g. 15" required />
+            <label for="cust-cost">Total Cost (Auto - KSH)</label>
+            <input type="number" id="cust-cost" value="0" readonly required />
           </div>
           <div class="form-group">
             <label for="cust-date">Date Milled</label>
@@ -568,7 +595,7 @@
     <!-- Inline Form 2: Add School Milling Record -->
     <section id="school-form-panel" class="form-panel">
       <div class="form-panel-header">
-        <h3>Add School Milling Record</h3>
+        <h3>Add School Milling Record (KSH 5,720 per Bag)</h3>
         <button type="button" class="btn btn-cancel" onclick="closeForms()">Close</button>
       </div>
       <form id="school-milling-form" onsubmit="saveSchoolRecord(event)">
@@ -580,11 +607,11 @@
           </div>
           <div class="form-group">
             <label for="school-bags">Number of Bags</label>
-            <input type="number" id="school-bags" min="1" placeholder="e.g. 20" required />
+            <input type="number" id="school-bags" min="1" step="1" placeholder="e.g. 20" oninput="updateSchoolValue()" required />
           </div>
           <div class="form-group">
-            <label for="school-value">Total Value</label>
-            <input type="number" id="school-value" min="0" step="any" placeholder="e.g. 1000" required />
+            <label for="school-value">Total Value (Auto - KSH)</label>
+            <input type="number" id="school-value" value="0" readonly required />
           </div>
           <div class="form-group">
             <label for="school-date">Date Milled</label>
@@ -603,9 +630,10 @@
       <h3>Report &amp; Analytics Overview</h3>
       <div class="date-query-box">
         <label for="query-date">Select Date:</label>
-        <input type="date" id="query-date" value="2023-10-26" onchange="renderDashboard()" />
-        <button type="button" class="btn btn-clear-date" onclick="showAllDates()">Show All Dates</button>
+        <input type="date" id="query-date" onchange="renderDashboard()" />
+        <button type="button" class="btn btn-clear-date" onclick="resetToToday()">Today</button>
       </div>
+      <div id="report-feedback-msg" class="report-feedback"></div>
     </section>
 
     <!-- 4 Summary Cards -->
@@ -614,15 +642,15 @@
         <div class="stat-icon">⚖️</div>
         <div class="stat-info">
           <span>Total KGs Milled (Verified)</span>
-          <strong id="card-total-kgs">320 Kg</strong>
+          <strong id="card-total-kgs">0 Kg</strong>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-icon">💳</div>
         <div class="stat-info">
-          <span>Total Money Collected</span>
-          <strong id="card-total-money">KSH 86</strong>
+          <span>Total Money Collected (Customers)</span>
+          <strong id="card-total-money">KSH 0</strong>
         </div>
       </div>
 
@@ -630,7 +658,7 @@
         <div class="stat-icon">🛍️</div>
         <div class="stat-info">
           <span>Bags Milled (Selected Date)</span>
-          <strong id="card-total-bags">30 Bags</strong>
+          <strong id="card-total-bags">0 Bags</strong>
         </div>
       </div>
 
@@ -638,7 +666,7 @@
         <div class="stat-icon">📊</div>
         <div class="stat-info">
           <span>Total Value of Unga Bags</span>
-          <strong id="card-bags-value">KSH 1,500</strong>
+          <strong id="card-bags-value">KSH 0</strong>
         </div>
       </div>
     </section>
@@ -683,23 +711,50 @@
   </footer>
 
   <script>
-    let customerRecords = [
-      { kg: 50, grade: "Grade 1", cost: 15, date: "2023-10-26" },
-      { kg: 100, grade: "Grade 2", cost: 25, date: "2023-10-26" },
-      { kg: 30, grade: "Grade 1", cost: 9, date: "2023-10-26" },
-      { kg: 50, grade: "Grade 1", cost: 15, date: "2023-10-26" },
-      { kg: 90, grade: "Grade 2", cost: 22, date: "2023-10-26" }
-    ];
-
-    let schoolRecords = [
-      { school: "St. Kizito School", bags: 20, value: 1000, date: "2023-10-26" },
-      { school: "Valley View Academy", bags: 10, value: 500, date: "2023-10-26" }
-    ];
+    const GRADE_RATES = {
+      "Grade 1": 8,
+      "Grade 2": 10,
+    };
+    const SCHOOL_BAG_PRICE = 5720;
 
     const API_URLS = {
       localMilling: "{% url 'milling:api-local-milling' %}",
       schoolMillRecords: "{% url 'milling:api-school-millrecords' %}",
+      dailySummary: "{% url 'milling:api-daily-millingsummary' %}",
     };
+
+    function calculateCustomerCost() {
+      const kg = parseFloat(document.getElementById("cust-kg").value);
+      const grade = document.getElementById("cust-grade").value;
+      const rate = GRADE_RATES[grade] ?? 0;
+
+      if (Number.isNaN(kg) || kg <= 0) {
+        return 0;
+      }
+      return Number((kg * rate).toFixed(2));
+    }
+
+    function updateCustomerCost() {
+      document.getElementById("cust-cost").value = calculateCustomerCost();
+    }
+
+    function calculateSchoolValue() {
+      const bags = parseInt(document.getElementById("school-bags").value, 10);
+      if (Number.isNaN(bags) || bags <= 0) {
+        return 0;
+      }
+      return bags * SCHOOL_BAG_PRICE;
+    }
+
+    function updateSchoolValue() {
+      document.getElementById("school-value").value = calculateSchoolValue();
+    }
+
+    function getTodayISO() {
+      const now = new Date();
+      const offsetMs = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
+    }
 
     function getCookie(name) {
       let cookieValue = null;
@@ -725,6 +780,18 @@
       msgBox.classList.add("show");
     }
 
+    function setReportFeedback(message, isError = false) {
+      const el = document.getElementById("report-feedback-msg");
+      if (!message) {
+        el.textContent = "";
+        el.classList.remove("show", "error");
+        return;
+      }
+      el.textContent = message;
+      el.classList.add("show");
+      el.classList.toggle("error", isError);
+    }
+
     function toggleForm(panelId) {
       const target = document.getElementById(panelId);
       const isAlreadyOpen = target.classList.contains("active");
@@ -733,11 +800,13 @@
 
       if (!isAlreadyOpen) {
         target.classList.add("active");
-        const selectedDate = document.getElementById("query-date").value || "2023-10-26";
+        const selectedDate = document.getElementById("query-date").value || getTodayISO();
         if (panelId === "customer-form-panel") {
           document.getElementById("cust-date").value = selectedDate;
+          updateCustomerCost();
         } else if (panelId === "school-form-panel") {
           document.getElementById("school-date").value = selectedDate;
+          updateSchoolValue();
         }
       }
     }
@@ -752,11 +821,13 @@
 
       const kg = document.getElementById("cust-kg").value.trim();
       const grade = document.getElementById("cust-grade").value;
-      const cost = document.getElementById("cust-cost").value;
+      const cost = calculateCustomerCost();
       const date = document.getElementById("cust-date").value;
 
+      document.getElementById("cust-cost").value = cost;
+
       const payload = {
-        kgs: kg,
+        kgs: `${kg}kgs`,
         unga_grade: grade,
         total_cost: cost,
         date_milled: date,
@@ -783,18 +854,12 @@
           return;
         }
 
-        customerRecords.unshift({
-          kg: data.kgs ?? kg,
-          grade: data.unga_grade ?? grade,
-          cost: data.total_cost ?? cost,
-          date: data.date_milled ?? date,
-        });
-
         document.getElementById("query-date").value = date;
-        renderDashboard();
+        await renderDashboard();
 
         document.getElementById("customer-milling-form").reset();
         document.getElementById("cust-date").value = date;
+        updateCustomerCost();
 
         showStatusMessage(
           "customer-success-msg",
@@ -815,8 +880,10 @@
 
       const school = document.getElementById("school-name").value.trim();
       const bags = parseInt(document.getElementById("school-bags").value, 10);
-      const value = document.getElementById("school-value").value;
+      const value = calculateSchoolValue();
       const date = document.getElementById("school-date").value;
+
+      document.getElementById("school-value").value = value;
 
       const payload = {
         name_of_school: school,
@@ -846,18 +913,12 @@
           return;
         }
 
-        schoolRecords.unshift({
-          school: data.name_of_school ?? school,
-          bags: data.number_of_bags ?? bags,
-          value: data.total_value ?? value,
-          date: data.date_milled ?? date,
-        });
-
         document.getElementById("query-date").value = date;
-        renderDashboard();
+        await renderDashboard();
 
         document.getElementById("school-milling-form").reset();
         document.getElementById("school-date").value = date;
+        updateSchoolValue();
 
         showStatusMessage(
           "school-success-msg",
@@ -873,38 +934,18 @@
       }
     }
 
-    function renderDashboard() {
-      const selectedDate = document.getElementById("query-date").value;
-
-      const filteredCustomers = selectedDate
-        ? customerRecords.filter((r) => r.date === selectedDate)
-        : customerRecords;
-
-      const filteredSchools = selectedDate
-        ? schoolRecords.filter((r) => r.date === selectedDate)
-        : schoolRecords;
-
-      const totalKgs = filteredCustomers.reduce((sum, r) => sum + Number(r.kg || 0), 0);
-      const totalMoney = filteredCustomers.reduce((sum, r) => sum + Number(r.cost || 0), 0);
-      const totalBags = filteredSchools.reduce((sum, r) => sum + Number(r.bags || 0), 0);
-      const totalBagsValue = filteredSchools.reduce((sum, r) => sum + Number(r.value || 0), 0);
-
-      document.getElementById("card-total-kgs").textContent = `${totalKgs.toLocaleString()} Kg`;
-      document.getElementById("card-total-money").textContent = `KSH ${totalMoney.toLocaleString()}`;
-      document.getElementById("card-total-bags").textContent = `${totalBags.toLocaleString()} Bags`;
-      document.getElementById("card-bags-value").textContent = `KSH ${totalBagsValue.toLocaleString()}`;
-
+    function renderTables(localRecords, schoolRecords) {
       const customerBody = document.getElementById("customer-table-body");
-      if (filteredCustomers.length === 0) {
+      if (!localRecords.length) {
         customerBody.innerHTML = `<tr class="empty-row"><td colspan="3">No customer milling records found for this date.</td></tr>`;
       } else {
-        customerBody.innerHTML = filteredCustomers
+        customerBody.innerHTML = localRecords
           .map(
             (r) => `
             <tr>
-              <td>${r.kg} kg</td>
-              <td>${r.grade}</td>
-              <td>KSH ${Number(r.cost).toLocaleString()}</td>
+              <td>${r.kgs}</td>
+              <td>${r.unga_grade}</td>
+              <td>KSH ${Number(r.amount).toLocaleString()}</td>
             </tr>
           `
           )
@@ -912,16 +953,16 @@
       }
 
       const schoolBody = document.getElementById("school-table-body");
-      if (filteredSchools.length === 0) {
+      if (!schoolRecords.length) {
         schoolBody.innerHTML = `<tr class="empty-row"><td colspan="3">No school milling records found for this date.</td></tr>`;
       } else {
-        schoolBody.innerHTML = filteredSchools
+        schoolBody.innerHTML = schoolRecords
           .map(
             (r, idx) => `
             <tr>
-              <td>${idx + 1}. ${r.school}</td>
-              <td>${r.bags} bags</td>
-              <td>KSH ${Number(r.value).toLocaleString()}</td>
+              <td>${idx + 1}. ${r.name_of_school}</td>
+              <td>${r.number_of_bags} bags</td>
+              <td>KSH ${Number(r.amount).toLocaleString()}</td>
             </tr>
           `
           )
@@ -929,20 +970,60 @@
       }
     }
 
-    function showAllDates() {
-      document.getElementById("query-date").value = "";
-      renderDashboard();
+    async function renderDashboard() {
+      const dateInput = document.getElementById("query-date");
+      const selectedDate = dateInput.value || getTodayISO();
+      if (!dateInput.value) {
+        dateInput.value = selectedDate;
+      }
+
+      document.getElementById("header-current-date").textContent = selectedDate;
+      setReportFeedback(`Loading records for ${selectedDate}...`, false);
+
+      try {
+        const url = `${API_URLS.dailySummary}?date=${encodeURIComponent(selectedDate)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+          setReportFeedback(data.error || "Failed to load records for selected date.", true);
+          renderTables([], []);
+          return;
+        }
+
+        const summary = data.summary || {};
+        const localRecords = data.local_records || [];
+        const schoolRecords = data.school_records || [];
+
+        const totalKgs = Number(summary.total_kgs || 0);
+        const customerMoney = Number(summary.local_money_collected || 0);
+        const schoolMoney = Number(summary.school_money_collected || 0);
+        const totalBags = schoolRecords.reduce((sum, r) => sum + Number(r.number_of_bags || 0), 0);
+
+        document.getElementById("card-total-kgs").textContent = `${totalKgs.toLocaleString()} Kg`;
+        document.getElementById("card-total-money").textContent = `KSH ${customerMoney.toLocaleString()}`;
+        document.getElementById("card-total-bags").textContent = `${totalBags.toLocaleString()} Bags`;
+        document.getElementById("card-bags-value").textContent = `KSH ${schoolMoney.toLocaleString()}`;
+
+        renderTables(localRecords, schoolRecords);
+
+        setReportFeedback(
+          `Showing data for ${data.date}: ${localRecords.length} customer record(s) (${totalKgs.toLocaleString()} kg, KSH ${customerMoney.toLocaleString()}) and ${schoolRecords.length} school record(s) (${totalBags.toLocaleString()} bags, KSH ${schoolMoney.toLocaleString()}).`,
+          false
+        );
+      } catch (error) {
+        console.error("Error fetching daily summary:", error);
+        setReportFeedback("Network error while fetching data from the server.", true);
+        renderTables([], []);
+      }
     }
 
-    function resetDashboard() {
-      closeForms();
-      document.getElementById("customer-success-msg").classList.remove("show");
-      document.getElementById("school-success-msg").classList.remove("show");
-      document.getElementById("query-date").value = "2023-10-26";
+    function resetToToday() {
+      document.getElementById("query-date").value = getTodayISO();
       renderDashboard();
     }
 
     renderDashboard();
-</script>
+  </script>
 </body>
 </html>

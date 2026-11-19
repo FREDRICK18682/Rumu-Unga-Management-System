@@ -31,6 +31,9 @@ class PackagingProcurement(models.Model):
     cost_of_bags = models.DecimalField(
         max_digits=12, decimal_places=2, help_text="Total cost of bag bought"
     )
+    type_of_papers = models.CharField(max_length=20, blank=True,
+        default="", help_text="1KG, 2KGs, 5KGS, 10KGS"
+    )
     date_bought = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
 

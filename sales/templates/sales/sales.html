@@ -71,7 +71,7 @@
 
     <!-- KPI Summary Cards (5 Cards) -->
     <section aria-label="Sales Summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      
+
       <!-- 1. Bales in Store -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-200/80 shadow-sm flex items-start justify-between">
         <div>
@@ -152,7 +152,7 @@
         <div class="bg-emerald-950 text-white px-6 py-4 flex items-center justify-between">
           <div>
             <h2 class="text-base font-semibold">Record Paid Bales</h2>
-            <p class="text-xs text-emerald-300">Enter bales sold & money collected</p>
+            <p class="text-xs text-emerald-300">Enter bales sold &amp; money collected (KES 1,500 / bale)</p>
           </div>
         </div>
 
@@ -204,13 +204,13 @@
               />
             </div>
 
-            <!-- Amount of Money Collected -->
+            <!-- Amount of Money Collected (Auto-generated, Read-only) -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label for="amount-collected" class="block text-sm font-medium text-slate-700">
                   Money Collected (KES) <span class="text-rose-600">*</span>
                 </label>
-                <span id="rate-hint" class="text-xs text-emerald-700 font-medium">Auto-fills</span>
+                <span id="rate-hint" class="text-xs text-emerald-700 font-medium">Auto: 1,500 / bale</span>
               </div>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-sm font-semibold pointer-events-none">KES</span>
@@ -218,11 +218,11 @@
                   type="number"
                   id="amount-collected"
                   name="money_collected"
-                  min="1"
-                  step="any"
+                  value="0"
+                  readonly
+                  tabindex="-1"
                   required
-                  placeholder="e.g., 1500"
-                  class="w-full rounded-xl border border-slate-300 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-normal focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 tabular-nums"
+                  class="w-full rounded-xl border border-slate-300 bg-slate-100 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold cursor-not-allowed focus:outline-none tabular-nums"
                 />
               </div>
             </div>
@@ -263,7 +263,7 @@
         <div class="bg-rose-900 text-white px-6 py-4 flex items-center justify-between">
           <div>
             <h2 class="text-base font-semibold">Record Unpaid Bales (Credit)</h2>
-            <p class="text-xs text-rose-200">Enter bales taken on credit/not yet paid</p>
+            <p class="text-xs text-rose-200">Enter bales taken on credit (KES 1,500 / bale)</p>
           </div>
         </div>
 
@@ -315,13 +315,13 @@
               />
             </div>
 
-            <!-- Total Cost Expected -->
+            <!-- Total Cost Expected (Auto-generated, Read-only) -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label for="credit-amount-collected" class="block text-sm font-medium text-slate-700">
                   Total Value (KES) <span class="text-rose-600">*</span>
                 </label>
-                <span id="credit-rate-hint" class="text-xs text-rose-700 font-medium">Auto-fills</span>
+                <span id="credit-rate-hint" class="text-xs text-rose-700 font-medium">Auto: 1,500 / bale</span>
               </div>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-sm font-semibold pointer-events-none">KES</span>
@@ -329,11 +329,11 @@
                   type="number"
                   id="credit-amount-collected"
                   name="total_value"
-                  min="1"
-                  step="any"
+                  value="0"
+                  readonly
+                  tabindex="-1"
                   required
-                  placeholder="e.g., 15000"
-                  class="w-full rounded-xl border border-slate-300 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-normal focus:border-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-600/20 tabular-nums"
+                  class="w-full rounded-xl border border-slate-300 bg-slate-100 pl-12 pr-3.5 py-2.5 text-sm text-slate-900 font-semibold cursor-not-allowed focus:outline-none tabular-nums"
                 />
               </div>
             </div>
@@ -404,6 +404,8 @@
   <!-- JavaScript Integration with Django Backend APIs -->
   <script>
     (() => {
+      const BALE_PRICE = 1500;
+
       // Helper function to extract Django CSRF token for secure POST requests
       function getCookie(name) {
         let cookieValue = null;
@@ -421,8 +423,6 @@
       }
       const csrftoken = getCookie('csrftoken');
 
-      let manualAmountEdited = false;
-      let creditManualAmountEdited = false;
       let currentStoreBales = 0;
 
       // DOM Elements
@@ -452,6 +452,10 @@
       const creditAmountInput = document.getElementById('credit-amount-collected');
       const creditRateHint = document.getElementById('credit-rate-hint');
       const creditFormError = document.getElementById('credit-form-error');
+
+      // Enforce read-only state on auto-generated amount fields
+      amountInput.readOnly = true;
+      creditAmountInput.readOnly = true;
 
       const btnOpenResetModal = document.getElementById('btn-open-reset-modal');
       const resetModal = document.getElementById('reset-modal');
@@ -533,7 +537,7 @@
       // ** FETCH SUMMARY DATA FROM DJANGO SUMMARY API **
       async function fetchDailySummary(dateVal) {
         try {
-          const response = await fetch(`/sales/api/daily-summary/?date=${dateVal}`);
+          const response = await fetch(`/sales/api/daily-summary/?date=${encodeURIComponent(dateVal)}`);
           if (!response.ok) throw new Error('Failed to fetch summary data');
           const data = await response.json();
 
@@ -557,7 +561,7 @@
           const data = await response.json();
           currentStoreBales = Number(data.bales_stock) || 0;
           kpiStoreBales.textContent = `${formatNumber(currentStoreBales)} bales`;
-          kpiStoreSubtext.textContent = `Database inventory`;
+          kpiStoreSubtext.textContent = 'Database inventory';
         } catch (error) {
           console.error('Error fetching bales stock:', error);
           currentStoreBales = 0;
@@ -568,70 +572,52 @@
       // Main refresh trigger when date changes
       function refreshDashboard() {
         const selectedDate = dateFilterInput.value;
-        fetchDailySummary(selectedDate);
+        if (selectedDate) {
+          fetchDailySummary(selectedDate);
+        }
       }
 
-      // Auto-calculate Form 1 amount
+      // Auto-calculate Form 1 amount (KES 1,500 per bale)
+      function computePaidAmount() {
+        const bales = parseInt(balesInput.value, 10);
+        if (!Number.isNaN(bales) && bales > 0) {
+          return bales * BALE_PRICE;
+        }
+        return 0;
+      }
+
       function updateSuggestedAmount() {
-        const bales = parseFloat(balesInput.value);
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
-
-        if (!isNaN(bales) && bales > 0 && !manualAmountEdited) {
-          amountInput.value = bales * rate;
-          rateHint.textContent = `@ ${formatNumber(rate)} / bale`;
-        } else if (isNaN(bales) || bales <= 0) {
-          if (!manualAmountEdited) {
-            amountInput.value = '';
-          }
-          rateHint.textContent = `Ref: ${formatNumber(rate)} / bale`;
-        }
+        const total = computePaidAmount();
+        amountInput.value = total;
+        rateHint.textContent = total > 0
+          ? `Auto @ ${formatNumber(BALE_PRICE)} / bale`
+          : `Auto: ${formatNumber(BALE_PRICE)} / bale`;
       }
 
-      // Auto-calculate Form 2 (Credit) amount
-      function updateCreditSuggestedAmount() {
-        const bales = parseFloat(creditBalesInput.value);
-        const selectedOption = creditProductSelect.options[creditProductSelect.selectedIndex];
-        const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
-
-        if (!isNaN(bales) && bales > 0 && !creditManualAmountEdited) {
-          creditAmountInput.value = bales * rate;
-          creditRateHint.textContent = `@ ${formatNumber(rate)} / bale`;
-        } else if (isNaN(bales) || bales <= 0) {
-          if (!creditManualAmountEdited) {
-            creditAmountInput.value = '';
-          }
-          creditRateHint.textContent = `Ref: ${formatNumber(rate)} / bale`;
+      // Auto-calculate Form 2 (Credit) amount (KES 1,500 per bale)
+      function computeCreditAmount() {
+        const bales = parseInt(creditBalesInput.value, 10);
+        if (!Number.isNaN(bales) && bales > 0) {
+          return bales * BALE_PRICE;
         }
+        return 0;
+      }
+
+      function updateCreditSuggestedAmount() {
+        const total = computeCreditAmount();
+        creditAmountInput.value = total;
+        creditRateHint.textContent = total > 0
+          ? `Auto @ ${formatNumber(BALE_PRICE)} / bale`
+          : `Auto: ${formatNumber(BALE_PRICE)} / bale`;
       }
 
       // Event listeners for Form 1
-      balesInput.addEventListener('input', () => {
-        if (amountInput.value === '') manualAmountEdited = false;
-        updateSuggestedAmount();
-      });
-      productSelect.addEventListener('change', () => {
-        manualAmountEdited = false;
-        updateSuggestedAmount();
-      });
-      amountInput.addEventListener('input', () => {
-        manualAmountEdited = amountInput.value.trim() !== '';
-        rateHint.textContent = manualAmountEdited ? 'Custom amount' : '@ rate';
-      });
+      balesInput.addEventListener('input', updateSuggestedAmount);
+      productSelect.addEventListener('change', updateSuggestedAmount);
 
       // Event listeners for Form 2 (Credit)
-      creditBalesInput.addEventListener('input', () => {
-        if (creditAmountInput.value === '') creditManualAmountEdited = false;
-        updateCreditSuggestedAmount();
-      });
-      creditProductSelect.addEventListener('change', () => {
-        creditManualAmountEdited = false;
-        updateCreditSuggestedAmount();
-      });
-      creditAmountInput.addEventListener('input', () => {
-        creditManualAmountEdited = creditAmountInput.value.trim() !== '';
-        creditRateHint.textContent = creditManualAmountEdited ? 'Custom amount' : '@ rate';
-      });
+      creditBalesInput.addEventListener('input', updateCreditSuggestedAmount);
+      creditProductSelect.addEventListener('change', updateCreditSuggestedAmount);
 
       // Date Filter Change Listener
       dateFilterInput.addEventListener('change', () => {
@@ -648,10 +634,13 @@
           return;
         }
 
+        const calculatedMoney = computePaidAmount();
+        amountInput.value = calculatedMoney;
+
         const payload = {
           unga_bale_size: productSelect.value,
           number_of_bales: requestedBales,
-          money_collected: parseFloat(amountInput.value),
+          money_collected: calculatedMoney,
           payment_method: saleForm.querySelector('input[name="paymentMethod"]:checked').value,
           date_bought: saleDateBoughtInput.value
         };
@@ -672,15 +661,13 @@
             throw new Error(formatApiError(data, 'Failed to save paid sale.'));
           }
 
-          // Automatically sync filter date to the newly recorded entry date and refresh
           dateFilterInput.value = data.date_bought;
           refreshDashboard();
           fetchBalesStock();
-          showToast(`Recorded ${data.number_of_bales} paid bales successfully!`);
+          showToast(`Recorded ${data.number_of_bales} paid bales (${formatKES(calculatedMoney)}) successfully!`);
 
           saleForm.reset();
           saleDateBoughtInput.value = todayISO;
-          manualAmountEdited = false;
           updateSuggestedAmount();
           balesInput.focus();
         } catch (err) {
@@ -700,10 +687,13 @@
           return;
         }
 
+        const calculatedValue = computeCreditAmount();
+        creditAmountInput.value = calculatedValue;
+
         const payload = {
           unga_bale_size: creditProductSelect.value,
           number_of_bales: requestedBales,
-          total_value: parseFloat(creditAmountInput.value),
+          total_value: calculatedValue,
           date_bought: creditDateBoughtInput.value
         };
 
@@ -723,15 +713,13 @@
             throw new Error(formatApiError(data, 'Failed to save credit sale.'));
           }
 
-          // Automatically sync filter date to the newly recorded entry date and refresh
           dateFilterInput.value = data.date_bought;
           refreshDashboard();
           fetchBalesStock();
-          showToast(`Recorded ${data.number_of_bales} unpaid credit bales!`);
+          showToast(`Recorded ${data.number_of_bales} unpaid credit bales (${formatKES(calculatedValue)})!`);
 
           creditForm.reset();
           creditDateBoughtInput.value = todayISO;
-          creditManualAmountEdited = false;
           updateCreditSuggestedAmount();
           creditBalesInput.focus();
         } catch (err) {

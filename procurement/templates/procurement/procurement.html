@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,24 +15,63 @@
         Maize Mill Procurement Dashboard
     </h1>
 
-    <!-- TWO MAIN BUTTONS -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- ACTION BUTTONS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
-       <a 
-       href="{% url 'Home:index' %}"
-       class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer">
-    Home</a>
-
+        <a 
+            href="{% url 'Home:index' %}"
+            class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-sm sm:text-base font-semibold p-4 rounded-lg shadow transition cursor-pointer">
+            Home
+        </a>
 
         <button onclick="showForm('maizeForm')"
-            class="bg-green-600 hover:bg-green-700 text-white p-5 rounded-lg shadow font-bold text-lg">
-            + Add Maize
+            class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg shadow font-bold text-base sm:text-lg transition cursor-pointer">
+            + Add Maize Bags
         </button>
 
         <button onclick="showForm('packagingForm')"
-            class="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-lg shadow font-bold text-lg">
-            + Add Packaging Papers & Bags
+            class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg shadow font-bold text-base sm:text-lg transition cursor-pointer">
+            + Add Packaging Materials
         </button>
+
+    </div>
+
+    <!-- TWO PAPER SIZE CARDS (1KG & 2KG) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600 flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Total Sum by Type
+                </p>
+                <h2 class="text-lg font-bold text-gray-800 mt-1">
+                    1KG Papers
+                </h2>
+                <p id="cardPapers1kg" class="text-3xl font-bold text-blue-700 mt-2 tabular-nums">
+                    0
+                </p>
+            </div>
+            <div class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1.5 rounded-full">
+                1KG
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-emerald-600 flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Total Sum by Type
+                </p>
+                <h2 class="text-lg font-bold text-gray-800 mt-1">
+                    2KG Papers
+                </h2>
+                <p id="cardPapers2kg" class="text-3xl font-bold text-emerald-700 mt-2 tabular-nums">
+                    0
+                </p>
+            </div>
+            <div class="bg-emerald-100 text-emerald-700 font-bold text-sm px-3 py-1.5 rounded-full">
+                2KG
+            </div>
+        </div>
 
     </div>
 
@@ -72,7 +110,7 @@
         </form>
     </div>
 
-    <!-- PACKAGING FORM -->
+    <!-- PACKAGING FORM (All fields optional) -->
     <div id="packagingForm" class="hidden bg-white p-6 rounded-lg shadow mb-8">
 
         <h2 class="text-xl font-bold text-blue-700 mb-4">
@@ -81,33 +119,41 @@
 
         <form id="packagingPurchaseForm" class="space-y-4">
 
-            <label class="block font-medium">Number of Papers</label>
+            <label class="block font-medium">Number of Papers (optional)</label>
             <input type="number" id="pkg_papers"
-                min="0" required
-                placeholder="Number of Papers"
+                min="0"
+                placeholder="Number of Papers (optional)"
                 class="w-full border p-3 rounded">
 
-            <label class="block font-medium">Cost of Papers</label>
+            <label class="block font-medium">Type of Papers (optional)</label>
+            <select id="pkg_type_of_papers"
+                class="w-full border p-3 rounded bg-white">
+                <option value="">-- Select Type of Papers (1KG / 2KG) --</option>
+                <option value="1KG">1KG</option>
+                <option value="2KG">2KG</option>
+            </select>
+
+            <label class="block font-medium">Cost of Papers (optional)</label>
             <input type="number" id="pkg_cost_papers"
-                min="0" step="0.01" required
-                placeholder="Cost of Papers"
+                min="0" step="0.01"
+                placeholder="Cost of Papers (optional)"
                 class="w-full border p-3 rounded">
 
-            <label class="block font-medium">Number of Packaging Bags</label>
+            <label class="block font-medium">Number of Packaging Bags (optional)</label>
             <input type="number" id="pkg_bags"
-                min="0" required
-                placeholder="Number of Packaging Bags"
+                min="0"
+                placeholder="Number of Packaging Bags (optional)"
                 class="w-full border p-3 rounded">
 
-            <label class="block font-medium">Cost of Packaging Bags</label>
+            <label class="block font-medium">Cost of Packaging Bags (optional)</label>
             <input type="number" id="pkg_cost_bags"
-                min="0" step="0.01" required
-                placeholder="Cost of Packaging Bags"
+                min="0" step="0.01"
+                placeholder="Cost of Packaging Bags (optional)"
                 class="w-full border p-3 rounded">
 
-            <label class="block font-medium">Date Bought</label>
+            <label class="block font-medium">Date Bought (optional)</label>
             <input type="date" id="pkg_date"
-                required class="w-full border p-3 rounded">
+                class="w-full border p-3 rounded">
 
             <button type="submit"
                 class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">
@@ -137,6 +183,7 @@
                     <tr class="bg-gray-700 text-white">
                         <th class="p-4 text-left">Item</th>
                         <th class="p-4 text-left">Quantity in Store</th>
+                        <th class="p-4 text-right">Action</th>
                     </tr>
                 </thead>
 
@@ -146,7 +193,7 @@
                         <td class="p-4 font-medium">Maize Bags</td>
                         <td class="p-4" id="stockMaize">0</td>
                         <td class="p-4 text-right">
-                            <button onclick="editStock('maize')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                            <button onclick="editStock('maize')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow cursor-pointer">
                                 Edit
                             </button>
                         </td>
@@ -156,7 +203,7 @@
                         <td class="p-4 font-medium">Packaging Papers</td>
                         <td class="p-4" id="stockPapers">0</td>
                         <td class="p-4 text-right">
-                            <button onclick="editStock('papers')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                            <button onclick="editStock('papers')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow cursor-pointer">
                                 Edit
                             </button>
                         </td>
@@ -166,7 +213,7 @@
                         <td class="p-4 font-medium">Packaging Bags</td>
                         <td class="p-4" id="stockBags">0</td>
                         <td class="p-4 text-right">
-                            <button onclick="editStock('bags')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
+                            <button onclick="editStock('bags')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow cursor-pointer">
                                 Edit
                             </button>
                         </td>
@@ -179,17 +226,102 @@
         </div>
     </div>
 
+    <!-- EDIT STOCK FORM (Appears below the table when clicking Edit) -->
+    <div id="editStockFormCard" class="hidden bg-white p-6 rounded-lg shadow border-l-4 border-amber-500 mt-8">
+
+        <h2 id="editStockTitle" class="text-xl font-bold text-amber-700 mb-4">
+            Edit Stock
+        </h2>
+
+        <form id="editStockForm" class="space-y-4">
+            <input type="hidden" id="edit_item_type" value="">
+
+            <!-- Bags Fields (Maize Bags or Packaging Bags): Number of Bags + Cost -->
+            <div id="editBagsFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="edit_stock_bags" id="editBagsLabel" class="block font-medium text-gray-700 mb-1">
+                        Number of Bags
+                    </label>
+                    <input type="number" id="edit_stock_bags"
+                        min="0"
+                        placeholder="Number of Bags"
+                        class="w-full border p-3 rounded">
+                </div>
+
+                <div>
+                    <label for="edit_bags_cost" class="block font-medium text-gray-700 mb-1">
+                        Cost
+                    </label>
+                    <input type="number" id="edit_bags_cost"
+                        min="0" step="0.01"
+                        placeholder="Cost"
+                        class="w-full border p-3 rounded">
+                </div>
+            </div>
+
+            <!-- Packaging Papers Fields: Number of Papers + Type of Papers + Cost -->
+            <div id="editPapersFields" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="edit_pkg_papers" class="block font-medium text-gray-700 mb-1">
+                        Number of Papers
+                    </label>
+                    <input type="number" id="edit_pkg_papers"
+                        min="0"
+                        placeholder="Number of Papers"
+                        class="w-full border p-3 rounded">
+                </div>
+
+                <div>
+                    <label for="edit_pkg_type_of_papers" class="block font-medium text-gray-700 mb-1">
+                        Type of Papers
+                    </label>
+                    <select id="edit_pkg_type_of_papers"
+                        class="w-full border p-3 rounded bg-white">
+                        <option value="">-- Select Type (1KG / 2KG) --</option>
+                        <option value="1KG">1KG</option>
+                        <option value="2KG">2KG</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="edit_papers_cost" class="block font-medium text-gray-700 mb-1">
+                        Cost
+                    </label>
+                    <input type="number" id="edit_papers_cost"
+                        min="0" step="0.01"
+                        placeholder="Cost"
+                        class="w-full border p-3 rounded">
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button type="submit"
+                    class="bg-amber-600 text-white px-6 py-3 rounded hover:bg-amber-700 font-semibold cursor-pointer">
+                    Update Stock
+                </button>
+
+                <button type="button" onclick="hideForms()"
+                    class="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 cursor-pointer">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
 </div>
 <script>
 // Global stock variables
 let maizeStock = 0;
 let papersStock = 0;
+let papers1kgStock = 0;
+let papers2kgStock = 0;
 let bagsStock = 0;
 
 // Function to toggle between forms
 function showForm(formId) {
     document.getElementById('maizeForm').classList.add('hidden');
     document.getElementById('packagingForm').classList.add('hidden');
+    document.getElementById('editStockFormCard').classList.add('hidden');
     document.getElementById(formId).classList.remove('hidden');
 }
 
@@ -197,61 +329,90 @@ function showForm(formId) {
 function hideForms() {
     document.getElementById('maizeForm').classList.add('hidden');
     document.getElementById('packagingForm').classList.add('hidden');
+    document.getElementById('editStockFormCard').classList.add('hidden');
 }
 
-// Update the inventory table view
+// Update the inventory table view and 1KG / 2KG paper cards
 function updateStock() {
     document.getElementById('stockMaize').textContent = maizeStock;
     document.getElementById('stockPapers').textContent = papersStock;
     document.getElementById('stockBags').textContent = bagsStock;
+    document.getElementById('cardPapers1kg').textContent = papers1kgStock;
+    document.getElementById('cardPapers2kg').textContent = papers2kgStock;
 }
-// Placeholder function for editing stock rows
+
+// Open the Edit Stock form populated for the selected row
 function editStock(itemType) {
-    let currentVal = 0;
-    let itemName = "";
+    const itemName = itemType === 'maize'
+        ? "Maize Bags"
+        : (itemType === 'papers' ? "Packaging Papers" : "Packaging Bags");
+    const currentQty = itemType === 'maize'
+        ? maizeStock
+        : (itemType === 'papers' ? papersStock : bagsStock);
 
-    if (itemType === 'maize') {
-        currentVal = maizeStock;
-        itemName = "Maize Bags";
-    } else if (itemType === 'papers') {
-        currentVal = papersStock;
-        itemName = "Packaging Papers";
-    } else if (itemType === 'bags') {
-        currentVal = bagsStock;
-        itemName = "Packaging Bags";
+    document.getElementById('edit_item_type').value = itemType;
+    document.getElementById('editStockTitle').textContent = `Edit ${itemName}`;
+
+    const bagsFields = document.getElementById('editBagsFields');
+    const papersFields = document.getElementById('editPapersFields');
+
+    if (itemType === 'papers') {
+        papersFields.classList.remove('hidden');
+        bagsFields.classList.add('hidden');
+        document.getElementById('edit_pkg_papers').value = currentQty;
+        document.getElementById('edit_pkg_type_of_papers').value = "";
+        document.getElementById('edit_papers_cost').value = "0.00";
+    } else {
+        bagsFields.classList.remove('hidden');
+        papersFields.classList.add('hidden');
+        document.getElementById('editBagsLabel').textContent =
+            itemType === 'maize' ? "Number of Maize Bags" : "Number of Packaging Bags";
+        document.getElementById('edit_stock_bags').value = currentQty;
+        document.getElementById('edit_bags_cost').value = "0.00";
     }
 
-    const newVal = prompt(`Edit quantity for ${itemName}:`, currentVal);
-    if (newVal !== null && newVal.trim() !== "") {
-        const parsed = parseInt(newVal, 10);
-        if (!isNaN(parsed) && parsed >= 0) {
-            if (itemType === 'maize') maizeStock = parsed;
-            if (itemType === 'papers') papersStock = parsed;
-            if (itemType === 'bags') bagsStock = parsed;
-            updateStock();
-            // TODO: Add backend API call here if you want to persist the manual correction to your Django database
-        } else {
-            alert("Please enter a valid positive number.");
-        }
-    }
+    showForm('editStockFormCard');
+    document.getElementById('editStockFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-// Active Edit stock function communicating with Django API
-async function editStock(itemType) {
-    let itemName = itemType === 'maize' ? "Maize Bags" : (itemType === 'papers' ? "Packaging Papers" : "Packaging Bags");
-    let currentQty = itemType === 'maize' ? maizeStock : (itemType === 'papers' ? papersStock : bagsStock);
 
-    const qtyPrompt = prompt(`Enter new total quantity for ${itemName}:`, currentQty);
-    if (qtyPrompt === null) return;
+// Submit Edit Stock form to Django API
+document.getElementById("editStockForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-    const costPrompt = prompt(`Enter total cost for this update:`, "0.00");
-    if (costPrompt === null) return;
+    const itemType = document.getElementById('edit_item_type').value;
+    let newQty = 0;
+    let newCost = 0;
+    let typeOfPapers = "";
 
-    const newQty = parseInt(qtyPrompt, 10);
-    const newCost = parseFloat(costPrompt);
+    if (itemType === 'papers') {
+        const papersRaw = document.getElementById('edit_pkg_papers').value.trim();
+        const costRaw = document.getElementById('edit_papers_cost').value.trim();
+        newQty = papersRaw === "" ? 0 : parseInt(papersRaw, 10);
+        newCost = costRaw === "" ? 0 : parseFloat(costRaw);
+        typeOfPapers = document.getElementById('edit_pkg_type_of_papers').value;
+    } else {
+        const bagsRaw = document.getElementById('edit_stock_bags').value.trim();
+        const costRaw = document.getElementById('edit_bags_cost').value.trim();
+        newQty = bagsRaw === "" ? 0 : parseInt(bagsRaw, 10);
+        newCost = costRaw === "" ? 0 : parseFloat(costRaw);
+    }
 
     if (isNaN(newQty) || newQty < 0 || isNaN(newCost) || newCost < 0) {
-        alert("Please enter valid positive numbers.");
+        alert("Please enter valid non-negative numbers.");
         return;
+    }
+
+    const payload = {
+        item_type: itemType,
+        quantity: newQty,
+        cost: newCost
+    };
+
+    if (itemType === 'papers') {
+        payload.number_of_papers = newQty;
+        payload.type_of_papers = typeOfPapers;
+    } else {
+        payload.number_of_bags = newQty;
     }
 
     try {
@@ -261,25 +422,23 @@ async function editStock(itemType) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({
-                item_type: itemType,
-                quantity: newQty,
-                cost: newCost
-            })
+            body: JSON.stringify(payload)
         });
 
         if (response.ok) {
             alert('Updated successfully in database!');
-            loadStock(); // Reload stock from the backend to refresh numbers
+            hideForms();
+            await loadStock();
+            await loadPapersByType();
         } else {
             const err = await response.json();
-            alert('Failed to update: ' + err.message);
+            alert('Failed to update: ' + (err.message || JSON.stringify(err)));
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Network error while updating stock.');
     }
-}
+});
 
 // CSRF token helper for Django
 function getCookie(name) {
@@ -327,8 +486,7 @@ document.getElementById("maizePurchaseForm").addEventListener("submit", async fu
         });
 
         if (response.ok) {
-            maizeStock += parseInt(bagsVal, 10);
-            updateStock();
+            await loadStock();
             alert('Maize purchase saved successfully to database!');
             this.reset();
             hideForms();
@@ -343,27 +501,40 @@ document.getElementById("maizePurchaseForm").addEventListener("submit", async fu
     }
 });
 
-// Packaging Form Submission (Added)
+// Packaging Form Submission (All fields optional; defaults blank values to 0)
 document.getElementById("packagingPurchaseForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const papersVal = document.querySelector("#pkg_papers").value;
-    const costPapersVal = document.querySelector("#pkg_cost_papers").value;
-    const bagsVal = document.querySelector("#pkg_bags").value;
-    const costBagsVal = document.querySelector("#pkg_cost_bags").value;
+    const papersVal = document.querySelector("#pkg_papers").value.trim();
+    const typeOfPapersVal = document.querySelector("#pkg_type_of_papers").value;
+    const costPapersVal = document.querySelector("#pkg_cost_papers").value.trim();
+    const bagsVal = document.querySelector("#pkg_bags").value.trim();
+    const costBagsVal = document.querySelector("#pkg_cost_bags").value.trim();
     const dateVal = document.querySelector("#pkg_date").value;
 
-    if (papersVal === "" || costPapersVal === "" || bagsVal === "" || costBagsVal === "" || !dateVal) {
-        alert("Please fill in all fields.");
+    const papersCount = papersVal === "" ? 0 : parseInt(papersVal, 10);
+    const papersCost = costPapersVal === "" ? 0 : parseFloat(costPapersVal);
+    const bagsCount = bagsVal === "" ? 0 : parseInt(bagsVal, 10);
+    const bagsCost = costBagsVal === "" ? 0 : parseFloat(costBagsVal);
+    const resolvedDate = dateVal || new Date().toISOString().split('T')[0];
+
+    if (
+        isNaN(papersCount) || papersCount < 0 ||
+        isNaN(papersCost) || papersCost < 0 ||
+        isNaN(bagsCount) || bagsCount < 0 ||
+        isNaN(bagsCost) || bagsCost < 0
+    ) {
+        alert("Please enter valid non-negative numbers.");
         return;
     }
 
     const formData = {
-        number_of_papers: parseInt(papersVal, 10),
-        cost_of_papers: parseFloat(costPapersVal),
-        number_of_bags: parseInt(bagsVal, 10),
-        cost_of_bags: parseFloat(costBagsVal),
-        date_bought: dateVal
+        number_of_papers: papersCount,
+        type_of_papers: typeOfPapersVal,
+        cost_of_papers: papersCost,
+        number_of_bags: bagsCount,
+        cost_of_bags: bagsCost,
+        date_bought: resolvedDate
     };
 
     try {
@@ -377,9 +548,8 @@ document.getElementById("packagingPurchaseForm").addEventListener("submit", asyn
         });
 
         if (response.ok) {
-            papersStock += parseInt(papersVal, 10);
-            bagsStock += parseInt(bagsVal, 10);
-            updateStock();
+            await loadStock();
+            await loadPapersByType();
             alert('Packaging purchase saved successfully to database!');
             this.reset();
             hideForms();
@@ -394,19 +564,62 @@ document.getElementById("packagingPurchaseForm").addEventListener("submit", asyn
     }
 });
 
+// Fetch summed papers by type (1KG / 2KG) from the backend API and update the two cards
+async function loadPapersByType() {
+    try {
+        const response = await fetch('/procurement/api/papers-by-type/');
+        if (!response.ok) {
+            console.error('papers-by-type returned status:', response.status);
+            return;
+        }
+        const data = await response.json();
+
+        const normalize = (v) => (v || '').toString().trim().toUpperCase().replace(/\s+/g, '');
+
+        let sum1kg = Number(data.papers_1kg ?? data.papers_1kg_stock ?? 0) || 0;
+        let sum2kg = Number(data.papers_2kg ?? data.papers_2kg_stock ?? 0) || 0;
+
+        if (Array.isArray(data.by_type)) {
+            let found1kg = false;
+            let found2kg = false;
+            for (const row of data.by_type) {
+                const t = normalize(row.type_of_papers);
+                if (t === '1KG' || t === '1KGS') {
+                    sum1kg = (found1kg ? sum1kg : 0) + (Number(row.total_papers) || 0);
+                    found1kg = true;
+                } else if (t === '2KG' || t === '2KGS') {
+                    sum2kg = (found2kg ? sum2kg : 0) + (Number(row.total_papers) || 0);
+                    found2kg = true;
+                }
+            }
+        }
+
+        papers1kgStock = sum1kg;
+        papers2kgStock = sum2kg;
+        updateStock();
+    } catch (error) {
+        console.error('Network error while fetching papers by type:', error);
+    }
+}
+
 // Function to fetch current stock from the database and load it on the page
 async function loadStock() {
     try {
         const response = await fetch('/procurement/api/stock/');
         if (response.ok) {
             const data = await response.json();
-            
-            // Update global stock variables with database values
-            maizeStock = data.maize_stock;
-            papersStock = data.papers_stock;
-            bagsStock = data.bags_stock;
-            
-            // Refresh the table view
+
+            maizeStock = Number(data.maize_stock) || 0;
+            papersStock = Number(data.papers_stock) || 0;
+            bagsStock = Number(data.bags_stock) || 0;
+
+            if (data.papers_1kg_stock !== undefined) {
+                papers1kgStock = Number(data.papers_1kg_stock) || 0;
+            }
+            if (data.papers_2kg_stock !== undefined) {
+                papers2kgStock = Number(data.papers_2kg_stock) || 0;
+            }
+
             updateStock();
         } else {
             console.error('Failed to fetch stock summary');
@@ -416,8 +629,11 @@ async function loadStock() {
     }
 }
 
-// Run loadStock automatically as soon as the HTML document is fully loaded
-document.addEventListener('DOMContentLoaded', loadStock);
+// Run initial fetches when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    loadStock();
+    loadPapersByType();
+});
 </script>
 </body>
 </html>
