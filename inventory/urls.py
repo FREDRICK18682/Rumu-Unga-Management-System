@@ -5,7 +5,8 @@ from .views import (
     CompanyMachineryInventoryAPIView,
     set_bales_stock,
     get_machinary_list,
-    update_companymachinery
+    update_companymachinery,
+    ProcessBalePapersAPIView
 )
 
 app_name = 'inventory'
@@ -17,4 +18,5 @@ urlpatterns = [
     path('api/stock/', set_bales_stock, name='api_bales_stock'),
     path('api/machinary/', get_machinary_list, name='api_companymachinary_list'),
     path('api/companymachinery/<int:pk>/', update_companymachinery, name='api_companymachinery_update'),
+    path("api/process-bale-papers/", ProcessBalePapersAPIView.as_view(), name="process-bale-papers"),
 ]

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Resource - Milling Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
+
+    <!-- Success Notification Toast (Hidden by default) -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-emerald-600 text-white px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 border border-emerald-500">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <div>
+                <p class="font-semibold text-sm" id="toastTitle">Success</p>
+                <p class="text-xs text-emerald-100" id="toastMessage">Data saved successfully.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Header -->
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold tracking-tight">
+                Human Resource
+            </h1>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+                <a href="{% url 'Home:index' %}"
+                   class="inline-flex items-center justify-center bg-rose-600/90 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition cursor-pointer gap-1.5">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <button onclick="openModal('employeeModal')"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium shadow-sm transition duration-150 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-plus"></i> Add Employee
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Three Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Total Staff Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Staff</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="totalStaffCount">0</p>
+                </div>
+            </div>
+
+            <!-- Present Today Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center gap-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Present Today</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="presentTodayCount">0</p>
+                </div>
+            </div>
+
+            <!-- On Leave / Off Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-center gap-4">
+                <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">On Leave / Off</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1" id="onLeaveCount">0</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Employees & Roles Table Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 class="text-xl font-bold text-slate-900">
+                    Employees &amp; Roles
+                </h2>
+
+                <!-- Search & Department Filter -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="searchInput" oninput="renderEmployees()" placeholder="Search"
+                               class="pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-56">
+                    </div>
+                    <select id="departmentFilter" onchange="renderEmployees()"
+                            class="px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Department</option>
+                        <option value="Milling & Hulling">Milling &amp; Hulling</option>
+                        <option value="Packing & Baling">Packing &amp; Baling</option>
+                        <option value="Loading & Dispatch">Loading &amp; Dispatch</option>
+                        <option value="Accounts & Admin">Accounts &amp; Admin</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-700">
+                    <thead class="bg-slate-50 text-slate-600 text-xs font-semibold border-b border-slate-200">
+                        <tr>
+                            <th class="py-3.5 px-6">Name</th>
+                            <th class="py-3.5 px-6">Role</th>
+                            <th class="py-3.5 px-6">Department</th>
+                            <th class="py-3.5 px-6">Pay Rate</th>
+                            <th class="py-3.5 px-6">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200" id="employeeTableBody">
+                        <!-- Rows rendered dynamically via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Add Employee -->
+    <div id="employeeModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-emerald-600"></i> Add Employee
+                </h3>
+                <button onclick="closeModal('employeeModal')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form id="employeeForm" onsubmit="submitEmployee(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="empName" required placeholder="e.g. Samuel Mwangi"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Role</label>
+                    <input type="text" id="empRole" required placeholder="e.g. Miller Operator"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Department</label>
+                        <select id="empDepartment" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="Milling & Hulling">Milling &amp; Hulling</option>
+                            <option value="Packing & Baling">Packing &amp; Baling</option>
+                            <option value="Loading & Dispatch">Loading &amp; Dispatch</option>
+                            <option value="Accounts & Admin">Accounts &amp; Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Pay Rate (KES)</label>
+                        <input type="number" id="empPayRate" required min="0" step="0.01" placeholder="e.g. 700.00"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status</label>
+                    <select id="empStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('employeeModal')"
+                            class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500 cursor-pointer">
+                        Save Employee
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modals, Toast Notifications, Filtering, and API Integration -->
+    <script>
+        // CSRF token helper for Django
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        let toastTimeout;
+        function showToast(title, message) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMessage').innerText = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        // Holds staff records loaded from backend (or added locally before API is wired)
+        let employees = [];
+
+        function updateSummaryCards() {
+            const totalStaff = employees.length;
+            const presentToday = employees.filter(e => e.status === 'Active').length;
+            const onLeave = employees.filter(e => e.status === 'On Leave').length;
+
+            document.getElementById('totalStaffCount').innerText = totalStaff.toLocaleString();
+            document.getElementById('presentTodayCount').innerText = presentToday.toLocaleString();
+            document.getElementById('onLeaveCount').innerText = onLeave.toLocaleString();
+        }
+
+        function escapeHtml(text) {
+            return String(text ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderEmployees() {
+            updateSummaryCards();
+
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const deptFilter = document.getElementById('departmentFilter').value;
+            const tbody = document.getElementById('employeeTableBody');
+
+            const filtered = employees.filter(emp => {
+                const name = String(emp.name || emp.full_name || '').toLowerCase();
+                const role = String(emp.role || emp.job_role || '').toLowerCase();
+                const dept = String(emp.department || '');
+
+                const matchesQuery = !query || name.includes(query) || role.includes(query) || dept.toLowerCase().includes(query);
+                const matchesDept = !deptFilter || dept === deptFilter;
+                return matchesQuery && matchesDept;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 px-6 text-center text-slate-400 text-sm">
+                            No employees to display. Click <strong>+ Add Employee</strong> to add a record.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(emp => {
+                const name = emp.name || emp.full_name || '';
+                const role = emp.role || emp.job_role || '';
+                const dept = emp.department || '';
+                const rate = Number(emp.pay_rate ?? emp.payRate ?? 0);
+                const status = emp.status || 'Active';
+
+                const statusBadge = status === 'Active'
+                    ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 inline-block">Active</span>'
+                    : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 inline-block">On Leave</span>';
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-4 px-6 font-medium text-slate-800">${escapeHtml(name)}</td>
+                        <td class="py-4 px-6 text-slate-700">${escapeHtml(role)}</td>
+                        <td class="py-4 px-6 text-slate-700">${escapeHtml(dept)}</td>
+                        <td class="py-4 px-6 text-slate-800 font-medium">${rate.toFixed(2)} KES</td>
+                        <td class="py-4 px-6">${statusBadge}</td>
+                    </tr>`;
+            }).join('');
+        }
+
+        // Load employees from Django REST API when ready
+        async function loadEmployees() {
+            try {
+                const response = await fetch('/hr/api/employees/');
+                if (response.ok) {
+                    const data = await response.json();
+                    employees = Array.isArray(data) ? data : (data.results || data.employees || []);
+                    renderEmployees();
+                } else {
+                    renderEmployees();
+                }
+            } catch (error) {
+                console.warn('HR API not connected yet; rendering empty state.', error);
+                renderEmployees();
+            }
+        }
+
+        // Save new employee to Django REST API (falls back to local list if endpoint isn't created yet)
+        async function submitEmployee(event) {
+            event.preventDefault();
+
+            const payload = {
+                name: document.getElementById('empName').value.trim(),
+                role: document.getElementById('empRole').value.trim(),
+                department: document.getElementById('empDepartment').value,
+                pay_rate: Number(document.getElementById('empPayRate').value || 0),
+                status: document.getElementById('empStatus').value
+            };
+
+            try {
+                const response = await fetch('/hr/api/employees/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    await loadEmployees();
+                } else {
+                    employees.push({ id: Date.now(), ...payload });
+                    renderEmployees();
+                }
+            } catch (error) {
+                employees.push({ id: Date.now(), ...payload });
+                renderEmployees();
+            }
+
+            document.getElementById('employeeForm').reset();
+            closeModal('employeeModal');
+            showToast('Employee Saved!', `${payload.name} was added to HR.`);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEmployees();
+        });
+    </script>
+</body>
+</html>

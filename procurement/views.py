@@ -189,6 +189,7 @@ class PapersByTypeSummaryAPIView(APIView):
 
         return Response(data, status=status.HTTP_200_OK)
 
+
 def get_paper_stock_by_type(paper_type: str) -> int:
     normalized = (paper_type or "").strip().upper()
     total = (
@@ -198,6 +199,7 @@ def get_paper_stock_by_type(paper_type: str) -> int:
     )
     return int(total)
 
+#API to reducs the packaging papers base on type of bale
 def consume_papers_for_bales(number_of_bales: int, bale_type: str, date_used=None) -> dict:
     bales_count = int(number_of_bales)
     if bales_count <= 0:
@@ -208,30 +210,82 @@ def consume_papers_for_bales(number_of_bales: int, bale_type: str, date_used=Non
         raise ValueError("Bale type must be either '1KG' or '2KG'.")
 
     papers_used = bales_count * PAPERS_PER_BALE[normalized_type]
-    target_date = date_used or timezone.localdate()
 
     with transaction.atomic():
-        current_stock = get_paper_stock_by_type(normalized_type)
-        if current_stock < papers_used:
+        rows = list(
+            PackagingProcurement.objects.select_for_update()
+            .filter(type_of_papers__iexact=normalized_type, number_of_papers__gt=0)
+            .order_by("date_bought", "id")
+        )
+        available_stock = sum(r.number_of_papers for r in rows)
+
+        if available_stock < papers_used:
             raise ValueError(
                 f"Insufficient {normalized_type} papers in stock. "
-                f"Need {papers_used}, available {current_stock}."
+                f"Need {papers_used}, available {available_stock}."
             )
 
-        new_stock = current_stock - papers_used
+        remaining_to_deduct = papers_used
+        for row in rows:
+            if remaining_to_deduct <= 0:
+                break
+            if row.number_of_papers >= remaining_to_deduct:
+                row.number_of_papers -= remaining_to_deduct
+                row.save(update_fields=["number_of_papers"])
+                remaining_to_deduct = 0
+            else:
+                remaining_to_deduct -= row.number_of_papers
+                row.number_of_papers = 0
+                row.save(update_fields=["number_of_papers"])
 
-        PackagingProcurement.objects.create(
-            number_of_papers=-papers_used,
-            type_of_papers=normalized_type,
-            cost_of_papers=Decimal("0.00"),
-            number_of_bags=0,
-            cost_of_bags=Decimal("0.00"),
-            date_bought=target_date,
-        )
+        new_stock = available_stock - papers_used
 
     return {
         "bale_type": normalized_type,
         "number_of_bales": bales_count,
         "papers_used": papers_used,
+        "remaining_stock": new_stock,
+    }
+
+# an APi to reduces the packaging bags 
+def consume_bags_for_bales(number_of_bales: int) -> dict:
+    bales_count = int(number_of_bales)
+    if bales_count <= 0:
+        raise ValueError("Number of bales must be greater than 0.")
+
+    bags_used = bales_count  # 1 packaging bag per bale for both 1KG and 2KG
+
+    with transaction.atomic():
+        rows = list(
+            PackagingProcurement.objects.select_for_update()
+            .filter(number_of_bags__gt=0)
+            .order_by("date_bought", "id")
+        )
+        available_stock = sum(r.number_of_bags for r in rows)
+
+        if available_stock < bags_used:
+            raise ValueError(
+                f"Insufficient packaging bags in stock. "
+                f"Need {bags_used}, available {available_stock}."
+            )
+
+        remaining_to_deduct = bags_used
+        for row in rows:
+            if remaining_to_deduct <= 0:
+                break
+            if row.number_of_bags >= remaining_to_deduct:
+                row.number_of_bags -= remaining_to_deduct
+                row.save(update_fields=["number_of_bags"])
+                remaining_to_deduct = 0
+            else:
+                remaining_to_deduct -= row.number_of_bags
+                row.number_of_bags = 0
+                row.save(update_fields=["number_of_bags"])
+
+        new_stock = available_stock - bags_used
+
+    return {
+        "number_of_bales": bales_count,
+        "bags_used": bags_used,
         "remaining_stock": new_stock,
     }
